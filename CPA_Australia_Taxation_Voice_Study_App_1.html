@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPA Australia Taxation — Voice Study App</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f13;--surf:#1a1a24;--surf2:#22222f;--gold:#f0c060;--blue:#60c0f0;--green:#a0f080;--red:#f06060;--purple:#d080d0;--text:#e8e8f0;--muted:#7878a0;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3{font-family:'Playfair Display',serif}
+#keyModal{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+#keyCard{background:var(--surf);border:1px solid var(--gold);border-radius:var(--r);padding:28px;max-width:460px;width:100%}
+#keyCard h2{color:var(--gold);font-size:1.2rem;margin-bottom:8px}
+#keyCard p{color:var(--muted);font-size:0.84rem;line-height:1.6;margin-bottom:16px}
+#keyInput{width:100%;background:var(--surf2);border:1px solid var(--surf2);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.84rem;padding:10px 12px;outline:none;margin-bottom:10px}
+#keyInput:focus{border-color:var(--gold)}
+.keyBtns{display:flex;gap:8px;flex-wrap:wrap}
+#keyError{color:var(--red);font-size:0.78rem;margin-top:6px;display:none}
+.keyNote{background:var(--surf2);border-radius:8px;padding:10px 12px;font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.keyNote b{color:var(--text)}
+#topbar{background:var(--surf);border-bottom:1px solid var(--surf2);padding:10px 14px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+#appTitle{font-family:'Playfair Display',serif;color:var(--gold);font-size:0.95rem;white-space:nowrap;margin-right:4px}
+.mBtn{padding:5px 12px;border-radius:99px;border:1px solid var(--surf2);background:var(--surf2);color:var(--muted);cursor:pointer;font-size:0.75rem;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.mBtn.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
+.mBtn:hover:not(.active){border-color:var(--gold);color:var(--gold)}
+#keySettingsBtn{margin-left:auto;padding:4px 10px;border-radius:99px;border:1px solid var(--surf2);background:transparent;color:var(--muted);cursor:pointer;font-size:0.7rem;font-family:'DM Sans',sans-serif;white-space:nowrap}
+#keySettingsBtn:hover{border-color:var(--gold);color:var(--gold)}
+#partBar{background:var(--surf);border-bottom:1px solid var(--surf2);padding:7px 14px;display:flex;gap:5px;flex-wrap:wrap}
+.pBtn{padding:4px 12px;border-radius:99px;border:1px solid var(--surf2);background:transparent;color:var(--muted);cursor:pointer;font-size:0.73rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+.pBtn.active{background:var(--blue);color:#000;border-color:var(--blue);font-weight:600}
+.pBtn:hover:not(.active){border-color:var(--blue);color:var(--blue)}
+.pBtn.done{border-color:var(--green);color:var(--green)}
+#main{flex:1;padding:18px 14px 200px;max-width:760px;width:100%;margin:0 auto}
+.segProgress{display:flex;gap:5px;margin-bottom:16px}
+.segDot{width:26px;height:4px;border-radius:2px;background:var(--surf2);transition:all .3s}
+.segDot.done{background:var(--green)}.segDot.active{background:var(--gold)}
+.hookBox{background:linear-gradient(135deg,#1e1a0a,#231e10);border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.hookLabel{font-size:0.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.hookHead{font-family:'Playfair Display',serif;font-size:0.98rem;color:var(--gold);margin-bottom:8px;line-height:1.4}
+.hookBody{font-size:0.86rem;line-height:1.7;color:#d4c090}
+.hookBridge{margin-top:10px;font-size:0.8rem;color:var(--muted);font-style:italic}
+.conceptBox{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r);padding:18px;margin-bottom:13px}
+.conceptLabel{font-size:0.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:7px}
+.conceptHead{font-family:'Playfair Display',serif;font-size:1.02rem;margin-bottom:11px;color:var(--text)}
+.conceptBody{font-size:0.86rem;line-height:1.8;color:#c8c8e0;white-space:pre-wrap}
+.navBtns{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;transition:all .15s}
+.btn-ghost{background:var(--surf2);color:var(--text);border:1px solid var(--surf2)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-gold{background:var(--gold);color:#000}.btn-gold:hover{opacity:.85}
+.btn-blue{background:var(--blue);color:#000}.btn-blue:hover{opacity:.85}
+.btn-green{background:transparent;border:1px solid var(--green);color:var(--green)}.btn-green:hover{background:var(--green);color:#000}
+#partComplete{display:none;text-align:center;padding:28px 16px}
+#partComplete h2{color:var(--gold);margin-bottom:7px}
+#partComplete p{color:var(--muted);font-size:0.86rem;margin-bottom:20px}
+.completeOptions{display:flex;flex-direction:column;gap:9px;max-width:360px;margin:0 auto}
+.compOpt{padding:13px 18px;border-radius:var(--r);border:1px solid var(--surf2);background:var(--surf);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:all .2s}
+.compOpt:hover{border-color:var(--gold);color:var(--gold)}
+.compOpt .optTitle{font-weight:600;margin-bottom:2px}.compOpt .optSub{font-size:0.76rem;color:var(--muted)}
+#ssPicker{display:none;max-width:460px;margin:14px auto 0}
+.ssPickHead{font-size:0.8rem;color:var(--muted);margin-bottom:8px}
+.ssPickBtn{display:block;width:100%;padding:9px 13px;margin-bottom:5px;border-radius:8px;border:1px solid var(--surf2);background:var(--surf2);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;font-size:0.81rem;color:var(--text);transition:all .15s}
+.ssPickBtn:hover{border-color:var(--blue);color:var(--blue)}
+#quizView{display:none}
+.qHeader{display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.qChip{padding:4px 12px;border-radius:99px;font-size:0.73rem;font-weight:600}
+.chipC{background:#1a2e1a;color:var(--green);border:1px solid var(--green)}
+.chipW{background:#2e1a1a;color:var(--red);border:1px solid var(--red)}
+.chipN{background:var(--surf2);color:var(--muted)}
+.progWrap{background:var(--surf2);border-radius:99px;height:5px;margin-bottom:16px}
+.progFill{height:5px;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--blue));transition:width .4s}
+.qBox{background:linear-gradient(135deg,#1e1e2f,#1a1a30);border:1px solid var(--blue);border-radius:var(--r);padding:18px;margin-bottom:13px}
+.qLabel{font-size:0.67rem;letter-spacing:2px;color:var(--blue);text-transform:uppercase;margin-bottom:7px}
+.qText{font-family:'Playfair Display',serif;font-size:1.02rem;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.opt{padding:10px 14px;border-radius:8px;border:1px solid var(--surf2);background:var(--surf2);cursor:pointer;font-size:0.84rem;text-align:left;font-family:'DM Sans',sans-serif;color:var(--text);transition:all .15s}
+.opt:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.opt.correct{border-color:var(--green);background:#1a2e1a;color:var(--green)}
+.opt.wrong{border-color:var(--red);background:#2e1a1a;color:var(--red)}
+.opt:disabled{cursor:default}
+.fb{padding:12px;border-radius:8px;font-size:0.83rem;line-height:1.6;margin-bottom:11px;display:none}
+.fb.show{display:block}.fb.good{background:#1a2e1a;border:1px solid var(--green);color:var(--green)}
+.fb.bad{background:#2e1a1a;border:1px solid var(--red);color:#f09090}
+.qComplete{text-align:center;padding:28px 0}
+.qScore{font-family:'Playfair Display',serif;font-size:2.4rem;color:var(--gold);margin-bottom:5px}
+.qScoreSub{color:var(--muted);font-size:0.86rem;margin-bottom:18px}
+#voiceBar{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--surf2);z-index:200}
+#modeRow{display:flex;align-items:center;gap:5px;padding:7px 14px 5px;border-bottom:1px solid var(--surf2);flex-wrap:wrap}
+.rowLabel{font-size:0.63rem;color:var(--muted);margin-right:3px;white-space:nowrap;text-transform:uppercase;letter-spacing:1px}
+.vModeBtn{padding:4px 10px;border-radius:99px;border:1px solid var(--surf2);background:transparent;cursor:pointer;font-size:0.71rem;font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .2s;white-space:nowrap}
+.vModeBtn.vActive{font-weight:600;color:#000}
+.mode-lecturer.vActive{background:var(--gold);border-color:var(--gold)}
+.mode-podcast.vActive{background:var(--blue);border-color:var(--blue)}
+.mode-storyteller.vActive{background:var(--purple);border-color:var(--purple)}
+.mode-speedrun.vActive{background:var(--green);border-color:var(--green)}
+.mode-drill.vActive{background:var(--red);border-color:var(--red)}
+.mode-lecturer:hover:not(.vActive){border-color:var(--gold);color:var(--gold)}
+.mode-podcast:hover:not(.vActive){border-color:var(--blue);color:var(--blue)}
+.mode-storyteller:hover:not(.vActive){border-color:var(--purple);color:var(--purple)}
+.mode-speedrun:hover:not(.vActive){border-color:var(--green);color:var(--green)}
+.mode-drill:hover:not(.vActive){border-color:var(--red);color:var(--red)}
+#voiceRow{display:flex;align-items:center;gap:5px;padding:5px 14px;border-bottom:1px solid var(--surf2);flex-wrap:wrap}
+.vCharBtn{padding:4px 10px;border-radius:99px;border:1px solid var(--surf2);background:transparent;cursor:pointer;font-size:0.71rem;font-family:'DM Sans',sans-serif;color:var(--muted);transition:all .2s;white-space:nowrap}
+.vCharBtn.vActive{background:var(--surf2);border-color:var(--text);color:var(--text);font-weight:600}
+.vCharBtn:hover:not(.vActive){border-color:var(--text);color:var(--text)}
+#controlRow{display:flex;align-items:center;gap:9px;padding:7px 14px 9px;flex-wrap:wrap}
+.vBtn{width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.95rem;transition:all .15s;flex-shrink:0}
+.vBtn-play{background:var(--gold);color:#000}.vBtn-play:hover{opacity:.85}
+.vBtn-stop{background:var(--surf2);color:var(--text);border:1px solid var(--surf2)}.vBtn-stop:hover{border-color:var(--red);color:var(--red)}
+.vStatus{flex:1;min-width:80px}
+.vStatusLabel{font-size:0.65rem;color:var(--muted);margin-bottom:1px}
+.vStatusText{font-size:0.77rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.vSpeed{display:flex;align-items:center;gap:5px;font-size:0.67rem;color:var(--muted)}
+.vSpeed input[type=range]{width:60px;accent-color:var(--gold)}
+.readingPulse{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.readingPulse.active{background:var(--gold);animation:pulse 1s infinite}
+.readingPulse.loading{background:var(--blue);animation:pulse 0.5s infinite}
+.readingPulse.stopped{background:var(--surf2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#loadBar{height:2px;background:transparent;position:relative;overflow:hidden}
+#loadBarFill{position:absolute;left:-100%;top:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+#loadBar.loading #loadBarFill{animation:loadSlide 1.2s infinite}
+@keyframes loadSlide{0%{left:-100%}100%{left:100%}}
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:0.68rem;font-weight:600;margin-bottom:7px}
+.tag-m1{background:#1a1a2e;color:#a0a0ff;border:1px solid #a0a0ff}
+.tag-m2{background:#1a2a1a;color:var(--green);border:1px solid var(--green)}
+.tag-m3{background:#2a1a1a;color:var(--red);border:1px solid var(--red)}
+.tag-m4{background:#1a2a2a;color:var(--blue);border:1px solid var(--blue)}
+.tag-m5{background:#2a1a2a;color:var(--purple);border:1px solid var(--purple)}
+.tag-m6{background:#2a2a1a;color:var(--gold);border:1px solid var(--gold)}
+#debugPanel{display:none;position:fixed;top:60px;left:10px;right:10px;background:#1a0a0a;border:1px solid var(--red);border-radius:8px;padding:10px 12px;font-size:0.72rem;color:#f09090;z-index:500;word-break:break-all;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="keyModal">
+  <div id="keyCard">
+    <h2>🔑 OpenAI Voice Setup</h2>
+    <p>This app uses OpenAI TTS for high-quality voice on every device. Your key is saved on this device only and sent exclusively to OpenAI.</p>
+    <div class="keyNote">
+      <b>How to get your key:</b><br>
+      1. Go to <b>platform.openai.com</b><br>
+      2. Sign in &rarr; Profile &rarr; <b>API Keys</b> &rarr; Create new secret key<br>
+      3. Make sure you have at least <b>$5 credit</b> in Billing
+    </div>
+    <input type="password" id="keyInput" placeholder="Paste your OpenAI key here (sk-…)" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="new-password">
+    <div id="keyError">Key must start with sk- and be at least 20 characters</div>
+    <div class="keyNote" style="margin-top:10px">
+      <b>Cloudflare Worker URL (required for mobile):</b><br>
+      Paste your Worker URL below — e.g. <b>https://cpa-proxy.yourname.workers.dev</b><br>
+      Leave blank on desktop (not needed there).
+    </div>
+    <input type="text" id="proxyInput" placeholder="https://your-worker.workers.dev" autocomplete="off" spellcheck="false" style="width:100%;background:var(--surf2);border:1px solid var(--surf2);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.84rem;padding:10px 12px;outline:none;margin-bottom:10px">
+    <div class="keyBtns">
+      <button class="btn btn-gold" onclick="saveKey()">Save &amp; Start &rarr;</button>
+      <button class="btn btn-ghost" onclick="testKey()">Test Key First</button>
+    </div>
+  </div>
+</div>
+<div id="topbar">
+  <span id="appTitle">📚 CPA Tax</span>
+  <button class="mBtn active" onclick="selectModule(0)">M1: Legal</button>
+  <button class="mBtn" onclick="selectModule(1)">M2: Income</button>
+  <button class="mBtn" onclick="selectModule(2)">M3: CGT</button>
+  <button class="mBtn" onclick="selectModule(3)">M4: Individuals</button>
+  <button class="mBtn" onclick="selectModule(4)">M5: Entities</button>
+  <button class="mBtn" onclick="selectModule(5)">M6: GST &amp; FBT</button>
+  <button id="keySettingsBtn" onclick="showKeyModal()">&#9881; API Key</button>
+</div>
+<div id="partBar"></div>
+<div id="main">
+  <div id="lectureView"></div>
+  <div id="partComplete">
+    <div style="font-size:1.8rem;margin-bottom:7px">🎉</div>
+    <h2 id="pcTitle">Part Complete!</h2>
+    <p id="pcSub">Well done. What would you like to do next?</p>
+    <div class="completeOptions">
+      <div class="compOpt" onclick="repeatWhole()"><div class="optTitle">🔁 Repeat Entire Part</div><div class="optSub">Listen to the whole lecture again from the beginning</div></div>
+      <div class="compOpt" onclick="showSsPicker()"><div class="optTitle">📌 Repeat a Specific Section</div><div class="optSub">Choose which subsection to revisit</div></div>
+      <div class="compOpt" onclick="startQuiz()"><div class="optTitle">🎯 Take the Quiz</div><div class="optSub">Test what you have just learned</div></div>
+    </div>
+    <div id="ssPicker"></div>
+  </div>
+  <div id="quizView"></div>
+</div>
+<div id="voiceBar">
+  <div id="loadBar"><div id="loadBarFill"></div></div>
+  <div id="modeRow">
+    <span class="rowLabel">Mode</span>
+    <button class="vModeBtn mode-lecturer vActive" onclick="setMode('lecturer')">📚 Lecturer</button>
+    <button class="vModeBtn mode-podcast" onclick="setMode('podcast')">🎙️ Podcast</button>
+    <button class="vModeBtn mode-storyteller" onclick="setMode('storyteller')">🎭 Storyteller</button>
+    <button class="vModeBtn mode-speedrun" onclick="setMode('speedrun')">⚡ Speed Run</button>
+    <button class="vModeBtn mode-drill" onclick="setMode('drill')">🎯 Exam Drill</button>
+  </div>
+  <div id="voiceRow">
+    <span class="rowLabel">Voice</span>
+    <button class="vCharBtn vActive" data-voice="onyx" onclick="setVoice('onyx')">🎙 Onyx</button>
+    <button class="vCharBtn" data-voice="echo" onclick="setVoice('echo')">🔊 Echo</button>
+    <button class="vCharBtn" data-voice="fable" onclick="setVoice('fable')">📖 Fable</button>
+    <button class="vCharBtn" data-voice="alloy" onclick="setVoice('alloy')">⚡ Alloy</button>
+    <button class="vCharBtn" data-voice="nova" onclick="setVoice('nova')">✨ Nova</button>
+    <button class="vCharBtn" data-voice="shimmer" onclick="setVoice('shimmer')">🌟 Shimmer</button>
+  </div>
+  <div id="controlRow">
+    <div class="readingPulse stopped" id="pulse"></div>
+    <button class="vBtn vBtn-play" id="playBtn" onclick="togglePlay()">&#9654;</button>
+    <button class="vBtn vBtn-stop" onclick="stopAudio()">&#9632;</button>
+    <div class="vStatus">
+      <div class="vStatusLabel" id="vStatusLabel">Ready</div>
+      <div class="vStatusText" id="vStatusText">Choose a module and press Play</div>
+    </div>
+    <div class="vSpeed">
+      <span>Speed</span>
+      <input type="range" id="speedRange" min="0.7" max="1.5" step="0.05" value="0.92" oninput="updateSpeed(this.value)">
+      <span id="speedLabel">0.9x</span>
+    </div>
+  </div>
+</div>
+<div id="debugPanel"></div>
+<script>
+const SD = {
+ modules:[
+  // ---- MODULE 1 ----
+  {id:1,title:"Legal, Ethical & Regulatory Fundamentals",tag:"tag-m1",
+   parts:[
+    {id:"1A",title:"Part A: Fundamentals of Australian Tax Law",
+     segs:[
+      {head:"1.1 The Australian Tax Law Environment",
+       hook:{hl:"PwC Australia: The Tax Leak Scandal (2023)",
+        story:"In 2023, PwC Australia faced one of the worst professional ethics scandals in the country's corporate history. A PwC partner shared confidential Treasury briefings about proposed anti-avoidance laws with international colleagues and clients — allowing those clients to position themselves ahead of the legislation. The Tax Practitioners Board deregistered the partner. PwC was forced to sell its government consulting arm for one dollar. This is the legal and ethical environment that tax professionals operate within — and why breaches carry such serious consequences.",
+        bridge:"Now let's understand the legal framework that governs Australian taxation — the foundation every CPA must know."},
+       content:"The Australian tax system operates within a federal legal structure established by the Constitution. Section 51(ii) gives the Commonwealth the power to impose taxes. This is a concurrent power — states also have residual taxation powers for stamp duty, land tax and payroll tax.\n\nThe two chief assessment Acts are the Income Tax Assessment Act 1936 (ITAA36) and the Income Tax Assessment Act 1997 (ITAA97). ITAA97 is the primary modern Act, written in plain English.\n\nThe ATO sits within the executive arm of government — it administers tax law but does not make it. Disputes are resolved through the Administrative Review Tribunal, the Federal Court, and ultimately the High Court.\n\nA Bill becomes law through seven steps: Treasury drafting, first reading, second reading debate, committee consideration, third reading, Senate passage, and Royal Assent by the Governor-General. Only the House of Representatives can originate taxation Bills — the Senate cannot amend them."},
+      {head:"1.2 Tax Practitioners Board & Registration",
+       hook:{hl:"TPB Cancels Agent's Registration Over 200 Unlodged Returns (2024)",
+        story:"In 2024, the Tax Practitioners Board cancelled the registration of a Queensland tax agent after finding he had failed to lodge over two hundred client tax returns and BAS statements, despite collecting fees. Clients faced ATO penalties and interest charges as a direct result. The TPB investigation found no adequate systems or processes were in place — a clear breach of the Code of Professional Conduct. This is why TPB registration standards exist.",
+        bridge:"Let's look at what the TPB requires of registered tax agents — and why registration matters."},
+       content:"The Tax Practitioners Board is the independent body that registers and regulates tax agents and BAS agents. Registration is required to provide tax agent services for a fee.\n\nTo register, applicants must: hold a relevant degree or qualifications, complete approved courses in Australian tax law and commercial law, have supervised experience, and satisfy the 'fit and proper person' test.\n\nRegistered agents must maintain professional indemnity insurance, complete continuing professional education each year, and comply with the TPB Code of Professional Conduct.\n\nThe TPB can investigate complaints and impose sanctions including cautions, orders, suspension or outright cancellation of registration. Since January 2022, tax financial advice services have moved from TPB to ASIC oversight via the Financial Services and Credit Panel."},
+      {head:"1.3 & 1.4 Ethical Principles and the TPB Code",
+       hook:{hl:"CPA Member Expelled for Misappropriating Client Funds (2023)",
+        story:"In 2023, a CPA member in Victoria was expelled after investigations revealed they had misappropriated client trust funds, failed to disclose a conflict of interest when advising a client to invest in a related party's property, and provided misleading information to regulators. The conduct breached multiple provisions of APES 110 and the TPB Code. This was not a borderline case — it was a systematic failure of every fundamental ethical principle.",
+        bridge:"Let's examine the ethical obligations that govern all tax professionals under APES 110 and the TPB Code."},
+       content:"Tax professionals are subject to ethical obligations under two overlapping frameworks: APES 110 (Code of Ethics for Professional Accountants) and the TPB Code of Professional Conduct.\n\nAPES 110 establishes five fundamental principles: integrity — being straightforward and honest; objectivity — avoiding bias and conflicts of interest; professional competence and due care; confidentiality; and professional behaviour.\n\nAPES 220 deals specifically with taxation services, requiring practitioners to advise clients of their rights and obligations, and not to knowingly lodge false or misleading returns.\n\nThe TPB Code has strong overlap with APES 110 and additionally requires: acting in the client's interest, having adequate processes and systems, providing timely services, and managing conflicts of interest.\n\nWhen ethical conflicts arise, practitioners must apply a conceptual framework: identify the threat, evaluate its significance, apply safeguards. If unresolvable, refuse the engagement or resign."}
+     ],
+     quiz:[
+      {q:"Under which section of the Australian Constitution does the Commonwealth derive its primary power to impose income tax?",opts:["Section 90","Section 51(ii)","Section 114","Section 53"],ans:1,exp:"Section 51(ii) gives the Commonwealth power to make laws with respect to taxation generally. Section 90 reserves customs and excise exclusively for the Commonwealth."},
+      {q:"Which body registers and regulates tax agents in Australia?",opts:["ASIC","APRA","The Tax Practitioners Board","The ATO"],ans:2,exp:"The Tax Practitioners Board (TPB) registers and regulates tax agents and BAS agents. The ATO administers tax law but does not register practitioners."},
+      {q:"Which of the following is NOT one of the five fundamental ethical principles under APES 110?",opts:["Integrity","Objectivity","Profitability","Confidentiality"],ans:2,exp:"The five APES 110 principles are: integrity, objectivity, professional competence and due care, confidentiality, and professional behaviour. Profitability is not an ethical principle."},
+      {q:"A taxation Bill must originate in which house of Parliament?",opts:["The Senate","The House of Representatives","Either house","The Governor-General's Office"],ans:1,exp:"Under Section 53 of the Constitution, Bills imposing tax cannot originate in or be amended by the Senate. They must originate in the House of Representatives."}
+     ]
+    },
+    {id:"1B",title:"Part B: Administration of the Tax System",
+     segs:[
+      {head:"1.5 Income Tax Self-Assessment",
+       hook:{hl:"ATO Data-Matching Uncovers $1.3B in Return Discrepancies (2024)",
+        story:"In 2024, the ATO reported that its data-matching program — cross-referencing returns against employer payroll data, bank interest records, and property transaction databases — identified over 1.3 billion dollars in discrepancies in individual tax returns. The most common errors: omitted interest income, overclaimed work-from-home deductions, and unsubstantiated rental property expenses. Thousands of taxpayers received amended assessments. Self-assessment places the burden of accuracy squarely on the taxpayer.",
+        bridge:"Let's understand how the self-assessment system works — and what obligations it places on every taxpayer and their agent."},
+       content:"Australia uses a self-assessment system for income tax. The Commissioner accepts tax return information at face value and issues a notice of assessment without independently verifying every item.\n\nThis places primary responsibility on the taxpayer to correctly report income and deductions. However, the ATO can later audit returns and issue amended assessments.\n\nTime limits on amendments: two years from the notice of assessment for individuals with simple tax affairs; four years for most other taxpayers. No time limit applies where fraud or evasion is involved.\n\nTaxpayers who discover errors should promptly request an amendment. Voluntary disclosure before an ATO audit contact generally attracts reduced penalties.\n\nThe ATO uses sophisticated data matching — comparing returns against employer payroll data, bank records, property databases, share registries, and international data-sharing agreements — to identify discrepancies automatically."},
+      {head:"1.6 & 1.7 ATO Rulings and Tax Audits",
+       hook:{hl:"Chevron Australia: $340M Transfer Pricing Ruling (landmark case)",
+        story:"The Chevron case is a landmark in Australian tax. Chevron's Australian subsidiary borrowed $2.5 billion from a US affiliate at 1.2% interest, while the US entity borrowed at 9% — shifting profits offshore. The ATO had clear rulings on arm's-length pricing. The Full Federal Court agreed the arrangement was not arm's-length, and Chevron paid approximately $340 million in additional tax and penalties. The case shows exactly how ATO rulings work in practice and what happens when they are ignored.",
+        bridge:"Let's examine how ATO rulings and guidance documents work — and what happens during a tax audit."},
+       content:"The ATO publishes rulings and guidance to help taxpayers navigate complex law. A public ruling states the ATO's view of how law applies to a class of situations and is binding on the Commissioner — the ATO cannot impose tax inconsistently with a ruling a taxpayer has relied upon.\n\nTypes of rulings: taxation rulings (broad income tax issues), GST rulings, tax determinations (specific narrow points), product rulings (investment schemes), class rulings (specific groups such as shareholders in a buyback), and private rulings (specific taxpayer and their facts).\n\nA private ruling is issued to a specific taxpayer. The taxpayer must provide all relevant and material facts. The ruling is binding only if the taxpayer's actual circumstances match those described in the ruling.\n\nTax audits: The ATO verifies returns through audits. It can request documents, conduct interviews, and access third-party information. Taxpayers have rights during audit including the right to seek legal advice and to be treated fairly.\n\nAudit outcomes may include amended assessments, penalty tax, and General Interest Charge on unpaid amounts."},
+      {head:"1.8–1.10 Objections, Appeals and Penalties",
+       hook:{hl:"Property Developer Faces $2.7M Penalty for Intentional Disregard (2023)",
+        story:"In 2023, a Queensland property developer failed to declare $8.9 million in income from property sales, arguing the transactions were capital in nature and not taxable. The Federal Court disagreed — the transactions were part of a profit-making scheme constituting ordinary income. The Court upheld a 75 percent penalty — the maximum — for intentional disregard of the tax law. Additional General Interest Charges ran into the hundreds of thousands. This case shows exactly how the objection, appeals, and penalties system operates.",
+        bridge:"Let's cover taxpayer rights when they disagree with an assessment, and the penalty framework when things go wrong."},
+       content:"A taxpayer who disagrees with an ATO assessment can lodge a formal objection with the ATO, generally within 60 days of receiving the notice. The objection must state all grounds of disagreement.\n\nIf the objection is disallowed, the taxpayer can appeal to the Administrative Review Tribunal or Federal Court within 60 days.\n\nPenalty tax applies to tax shortfalls: 25% for failure to take reasonable care; 50% for recklessness; 75% for intentional disregard. These base rates can be reduced by up to 80% for voluntary disclosure made before the ATO notifies an audit.\n\nGeneral Interest Charge (GIC) runs on unpaid tax from the original due date. The rate is updated quarterly and is set above commercial rates to discourage late payment.\n\nThe Shortfall Interest Charge (SIC) applies on amended assessments — it runs from when the original tax was due to when the amended tax is due. SIC is lower than GIC."},
+      {head:"1.11 & 1.12 Tax Planning, Avoidance and Part IVA",
+       hook:{hl:"ATO Applies Part IVA to $1.1B Multinational Royalty Arrangement (2024)",
+        story:"In 2024, the ATO issued a landmark Part IVA determination against a major multinational, concluding that a series of related-party royalty payments to a Singapore holding entity — structured using hybrid financing — had been arranged with the dominant purpose of reducing Australian tax. The ATO cancelled the tax benefit and imposed a 50 percent penalty. The company announced it would appeal. This case illustrates how Part IVA targets sophisticated planning that crosses the line from legitimate minimisation into avoidance.",
+        bridge:"Let's define the critical distinction between lawful tax planning, tax avoidance, and criminal tax evasion — and understand how Part IVA works."},
+       content:"Tax planning is lawful. Taxpayers may arrange their affairs to minimise tax within the law. The High Court confirmed this principle: taxpayers are entitled to take advantage of whatever provisions the legislature has enacted.\n\nTax avoidance uses arrangements that comply with the technical letter of the law but produce results the legislature did not intend. Part IVA of ITAA36 is Australia's general anti-avoidance provision.\n\nPart IVA applies when: (1) there is a scheme; (2) a taxpayer obtains a tax benefit from the scheme; (3) having regard to eight specific factors, it is reasonable to conclude the dominant purpose of entering the scheme was to obtain a tax benefit. If all three apply, the Commissioner can cancel the tax benefit.\n\nThe eight factors include: the manner in which the scheme was entered into, its form versus substance, the timing, what result it achieves, and any change in financial position of the taxpayer and connected parties.\n\nTax evasion is a criminal offence — deliberate misrepresentation or concealment of income or assets. Penalties include fines and imprisonment under the Criminal Code Act 1995."}
+     ],
+     quiz:[
+      {q:"The standard time limit for the ATO to amend an assessment for an individual with simple tax affairs is:",opts:["1 year","2 years","4 years","No time limit"],ans:1,exp:"For individuals with simple tax affairs, the ATO has two years from the notice of assessment to amend. Four years applies to most other taxpayers. No time limit where fraud or evasion is involved."},
+      {q:"A taxpayer must lodge a formal objection to an assessment within how many days?",opts:["30 days","60 days","90 days","120 days"],ans:1,exp:"An objection must generally be lodged within 60 days of receiving the notice of assessment or amended assessment. Some situations allow a four-year extended period."},
+      {q:"The base penalty rate for recklessness (not intentional disregard) is:",opts:["25%","50%","75%","100%"],ans:1,exp:"50% applies to recklessness. 25% applies to failure to take reasonable care. 75% applies to intentional disregard. All rates can be reduced for voluntary disclosure."},
+      {q:"Part IVA requires that the dominant purpose of a scheme was to:",opts:["Earn assessable income","Obtain a tax benefit","Defer a tax liability","Avoid a GST obligation"],ans:1,exp:"Part IVA requires (1) a scheme, (2) a tax benefit, and (3) that the dominant purpose of the scheme was to obtain that tax benefit. Dominant purpose — not the sole purpose."}
+     ]
+    }
+   ]
+  },
+  // ---- MODULE 2 ----
+  {id:2,title:"Principles of Taxable Income",tag:"tag-m2",
+   parts:[
+    {id:"2A",title:"Part A: Residency and Source of Income",
+     segs:[
+      {head:"2.1 & 2.2 Residency Tests for Individuals",
+       hook:{hl:"ATO Pursues Expats Over Residency Status — $135M in Dispute (2023)",
+        story:"In 2023, the ATO increased focus on Australian expats — particularly those working in the Middle East, Singapore and the UK — who claimed non-resident status while maintaining strong Australian connections: property ownership, spouses and children in Australia, and regular returns. The ATO determined many remained Australian residents for tax purposes, making their worldwide income assessable in Australia. Some faced assessments exceeding $100,000 in unpaid tax. Residency classification is the critical first step in any income tax calculation.",
+        bridge:"Let's work through all four residency tests used to determine whether an individual is an Australian resident for tax purposes."},
+       content:"A resident of Australia is assessed on worldwide income. A non-resident is only assessed on Australian-sourced income. Getting this classification right is therefore the essential first step.\n\nFor individuals, four tests are applied in order — you only need to satisfy one to be a resident:\n\nTest 1 — Ordinary Concepts Test (common law): Does the person 'reside' in Australia? Courts consider: length of time here, purpose of presence, family ties, location of assets, social arrangements. A person is generally resident if their day-to-day behaviour shows continuity consistent with living in Australia.\n\nTest 2 — Domicile Test: A person domiciled in Australia is a resident unless they have established a permanent place of abode outside Australia. 'Permanent' means fixed and settled — not necessarily forever.\n\nTest 3 — 183-Day Test: Physically present in Australia for more than half the income year — a resident, unless they have a usual place of abode outside Australia and don't intend to take up residence here.\n\nTest 4 — Commonwealth Superannuation Test: For Commonwealth Government employees posted overseas and their families.\n\nFor companies: a company is an Australian resident if incorporated here, or managed and controlled here, or carries on business here with central management in Australia."},
+      {head:"2.3 Source of Income",
+       hook:{hl:"ATO Identifies 70,000 Australians With Undisclosed Foreign Income (2024)",
+        story:"In 2024, the ATO's international data-sharing under the Common Reporting Standard identified approximately 70,000 Australians holding offshore bank accounts or earning foreign income not declared in their Australian tax returns. Foreign dividends, rental income from overseas properties, and salary from offshore employment were the most common omissions. Because these taxpayers were Australian residents, all of their worldwide income was assessable — wherever it was earned.",
+        bridge:"Source rules determine when income is Australian-sourced — critical for non-residents and for understanding what residents must declare from abroad."},
+       content:"Source of income links income to a country for tax purposes. Australian residents are taxed on worldwide income regardless of source. Non-residents are taxed only on Australian-sourced income.\n\nEmployment income is generally sourced where the services are performed. A non-resident working in Australia pays Australian tax on that salary. An Australian resident working overseas must still declare that salary in Australia.\n\nBusiness income is generally sourced where the business activities occur — where contracts are made and services performed.\n\nPassive income — interest, dividends, royalties — is generally sourced where the payer is located.\n\nRental income is sourced where the property is located.\n\nFor non-residents, Australia imposes withholding tax as a final tax on Australian-sourced income: dividends 30 percent (or 15 percent under a DTA), interest 10 percent, royalties 30 percent. These are final taxes — not included in an Australian tax return."}
+     ],
+     quiz:[
+      {q:"An Australian resident works in Singapore for 8 months, earning $120,000. How much is assessable in Australia?",opts:["$0 — earned overseas","$120,000 — residents taxed on worldwide income","Only the Australian workday portion","50% as partly resident"],ans:1,exp:"Australian residents are assessed on worldwide income under s. 6-5(2) ITAA97. The $120,000 is fully assessable in Australia. A foreign income tax offset may reduce double taxation."},
+      {q:"A New Zealand citizen moves to Brisbane for work. After 7 months she returns to New Zealand. Under which test is she most likely a resident?",opts:["Ordinary concepts test","Domicile test","183-day test","Superannuation test"],ans:2,exp:"7 months is approximately 210 days — more than 183. She satisfies the 183-day test unless she can show a usual place of abode outside Australia and no intention to take up residence."},
+      {q:"Australia generally applies what withholding tax rate on royalties paid to non-residents (no DTA)?",opts:["0%","10%","15%","30%"],ans:3,exp:"Under domestic law, withholding tax on royalties paid to non-residents is 30%. DTAs often reduce this significantly — for example to 5% under the Australia-US DTA."}
+     ]
+    },
+    {id:"2B",title:"Part B: Assessable Income",
+     segs:[
+      {head:"2.4 & 2.5 Ordinary and Statutory Income",
+       hook:{hl:"ATO Rules Influencer's Gifted Products Are Assessable Income (2024)",
+        story:"In 2024, the ATO clarified that social media influencers who receive free products, sponsored travel, or cash for promotional content must declare these as assessable income. A lifestyle influencer argued that product gifts were not income. The ATO disagreed — the products were received as a reward for services, making them assessable as ordinary income at market value. This shows how ordinary income extends well beyond salary and wages.",
+        bridge:"Let's examine how Australian tax law defines ordinary income, statutory income, and what is specifically excluded from assessment."},
+       content:"Assessable income has two components: ordinary income and statutory income.\n\nOrdinary income under section 6-5 of ITAA97 is 'income according to ordinary concepts'. Courts have identified key characteristics: it is money or money's worth; it flows regularly or periodically; it is earned — not a gift or windfall; it is a reward for services, from carrying on a business, or from property such as interest, rent or dividends.\n\nStatutory income under section 6-10 is assessable because of specific legislative provisions — for example, capital gains under Division 102, employment termination payments under Division 82, and franking credits under Division 207.\n\nNon-assessable income includes: exempt income such as certain government payments; and non-assessable non-exempt income in specific international contexts.\n\nThe income versus capital distinction is critical. Capital receipts are generally not ordinary income — though they may trigger CGT. Courts distinguish income from capital by examining frequency of transactions, nature of the asset, intention at acquisition, and whether the asset is the fruit of a business operation."},
+      {head:"2.6 & 2.7 Non-Assessable Income and Derivation",
+       hook:{hl:"ATO Rules on Timing of Cryptocurrency Disposals (2024)",
+        story:"In 2024, the ATO updated guidance on crypto taxation following disputes about when income was 'derived'. A Sydney trader argued crypto income was only derived when converted to Australian dollars. The ATO rejected this — the taxable event occurs when the crypto is disposed of, whether exchanged for cash or for another crypto, based on market value at the time of disposal. This is the derivation principle: income is assessable in the year it is derived, not when cash arrives.",
+        bridge:"Let's look at what income is excluded from assessment — and when exactly income is 'derived' for tax purposes."},
+       content:"Non-assessable income includes exempt income and NANE income. Common examples of exempt income: defence force salary in combat zones, some compensation payments, certain government grants, and income of charitable entities.\n\nDerivation determines which income year assessable income is included in. The rule depends on the accounting method used.\n\nCash basis: income is derived when it is received. Common for most individual employees and smaller businesses.\n\nAccruals basis: income is derived when it is earned or receivable — the right to receive it has arisen — regardless of when payment actually arrives. Mandatory for larger businesses.\n\nThis timing distinction matters significantly at year-end: a business on accruals must include all invoices raised by 30 June in that year's assessable income, even if unpaid at that date."}
+     ],
+     quiz:[
+      {q:"Jessica receives a $5,000 loyalty bonus from her employer for staying 5 years. Is this assessable income?",opts:["No — it's a gift","No — it's a capital receipt","Yes — ordinary income, a reward for employment","Only if it exceeds $10,000"],ans:2,exp:"A loyalty bonus is assessable as ordinary income — it is received as a reward in the context of the employment relationship, not a genuine personal gift. Amount doesn't matter."},
+      {q:"A sole trader on accruals issues a $10,000 invoice on 25 June 2025, paid on 15 July 2025. In which year is it assessable?",opts:["2024-25 — when invoiced","2025-26 — when paid","Split between both years","Neither — under $10,000"],ans:0,exp:"On accruals basis, income is derived when the right to receive it arises — when the invoice was issued (25 June 2025). This falls in the 2024-25 income year."}
+     ]
+    },
+    {id:"2C",title:"Part C: Income Tax Deductions",
+     segs:[
+      {head:"2.8 General Deductions — Section 8-1",
+       hook:{hl:"ATO Disallows Billions in Work-From-Home Deductions (2023)",
+        story:"In 2023, the ATO's Random Enquiry Program found that work-from-home expense claims had increased by 40 percent since COVID. Many taxpayers claimed full home internet bills, electricity bills, and even mortgage payments as work deductions without meeting the general deduction tests. The ATO disallowed billions in claims. Working from home does not automatically make all home expenses deductible — each expense must satisfy the general deduction provision.",
+        bridge:"Let's understand the general deduction tests under section 8-1 that determine whether any expense is deductible."},
+       content:"Section 8-1 of ITAA97 is the general deduction provision. A loss or outgoing is deductible to the extent it is incurred in gaining or producing assessable income, or necessarily incurred in carrying on a business for that purpose.\n\nBoth positive limbs must be satisfied. However, deduction is denied if a negative limb applies: the expense is capital or capital in nature; is private or domestic; relates to exempt income; or is specifically denied by another provision.\n\nThe 'incurred' requirement: an expense is incurred when there is a present obligation to pay it — not merely a future liability.\n\nThe connection test: the expense must have a sufficient nexus to income-earning activities. Courts apply a direct and proximate connection test.\n\nApportionment: where an expense has both private and income-producing components — such as a car used partly for work — only the income-producing proportion is deductible."},
+      {head:"2.9 & 2.10 Specific Deductions and Limitations",
+       hook:{hl:"ATO Denies $3M 'Repairs' Deduction — Classified as Improvement (2024)",
+        story:"In 2024, a property investor tried to deduct $3.1 million in 'repairs' to an apartment complex she had recently purchased. The ATO found the works went beyond restoring the property to its original condition — they were improvements using higher-quality materials that added value. The ATO reclassified the expenditure as capital works, deductible under Division 43 at 2.5 percent per year — not immediately. The repair versus improvement distinction is one of the most litigated areas in Australian tax.",
+        bridge:"Now let's examine the specific deduction provisions — repairs, bad debts, borrowing expenses, losses — and the limitations that can deny them."},
+       content:"Specific deductions are allowed by particular provisions of ITAA97:\n\nRepairs under section 25-10: Deductible if they restore an asset to its former condition without improving it. Initial repairs on a newly acquired property are capital. Improvements are capital — not deductible as repairs.\n\nBad debts under section 25-35: A debt written off as bad is deductible if it was previously included in assessable income, or arose from a money-lending business.\n\nBorrowing expenses under section 25-25: Loan establishment fees and mortgage registration costs are deductible over the shorter of five years or the loan term.\n\nTax losses under Division 36: Where deductions exceed assessable income in a year, the excess is a tax loss carried forward to offset against future income.\n\nDenied deductions include: entertainment expenses (generally denied under Division 32); penalties and fines; private and domestic expenses.\n\nSubstantiation: Work-related expenses generally require written evidence. Exceptions include claims under $300 and ATO fixed rate methods for home office and car expenses."}
+     ],
+     quiz:[
+      {q:"Kate uses one room (12% of floor area) exclusively as a treatment room for her physiotherapy practice. Total home expenses are $30,000. Deductible amount?",opts:["$30,000","$3,600","$0 — home expenses are private","$1,500"],ans:1,exp:"Where a room is used exclusively for business, the deductible proportion is based on floor area. 12% × $30,000 = $3,600. The private 88% is not deductible."},
+      {q:"A property investor replaces a leaking roof on a recently purchased rental property with higher-quality materials. Is this deductible under s. 25-10?",opts:["Yes — it's a repair","Partially deductible","No — it's an initial repair and an improvement","Yes — all rental maintenance is deductible"],ans:2,exp:"This fails for two reasons: it is an initial repair (defect existed at purchase) and an improvement (higher quality than original). Both make it capital — deductible as capital works at 2.5% over time."}
+     ]
+    },
+    {id:"2D",title:"Part D: Capital Allowances",
+     segs:[
+      {head:"2.12–2.14 Division 40 — Depreciating Assets",
+       hook:{hl:"ATO Recovers $450M in Depreciation Errors From Construction Firms (2024)",
+        story:"In 2024, the ATO's audit of construction and engineering companies found widespread errors in depreciation calculations — incorrect effective lives, wrong methods applied, and failure to account for private use of vehicles. Over $450 million in amended assessments were issued. Depreciation is not just an accounting concept — it is a tax rule with precise requirements.",
+        bridge:"Let's work through the capital allowances framework under Division 40 of ITAA97."},
+       content:"Capital allowances allow a deduction for the cost of a depreciating asset over its effective life. The deduction is the 'decline in value' each year.\n\nA depreciating asset has a limited effective life and is expected to decline in value. Land is not a depreciating asset. Buildings are capital works (Division 43), not depreciating assets.\n\nTwo methods to calculate decline in value:\n\nPrime Cost Method: Decline = Cost × (Days held / 365) × (100% / Effective life). Equal deductions each year.\n\nDiminishing Value Method: Decline = Opening adjustable value × (Days held / 365) × (200% / Effective life). Larger deductions in earlier years, declining over time.\n\nEffective life is either self-assessed or taken from ATO published tables.\n\nOnly the taxable use proportion is deductible. A car used 60% for work gives 60% of its decline in value as a deduction.\n\nWhen an asset is sold or scrapped, a balancing adjustment applies: if termination value exceeds adjustable value, the excess is assessable. If adjustable value exceeds termination value, the difference is deductible."},
+      {head:"2.17 Small Business Entity Simplified Depreciation",
+       hook:{hl:"Small Businesses Claim $14B in Instant Asset Write-Offs (2024)",
+        story:"In 2024, the ATO reported small businesses collectively claimed approximately $14 billion in instant asset write-offs for the 2022-23 year. Many owners were confused as the instant write-off threshold changed multiple times — from full expensing during COVID, to the $20,000 threshold from July 2023. Understanding which threshold applies and whether your business qualifies as an SBE is essential.",
+        bridge:"Let's examine the simplified depreciation rules available to Small Business Entities."},
+       content:"A Small Business Entity is generally an entity with aggregated annual turnover under $10 million.\n\nSBEs can use simplified depreciation rules:\n\nFirst: Assets costing less than the instant asset write-off threshold — from 1 July 2023, this is $20,000 — can be immediately deducted in the year they are first used or installed ready for use.\n\nSecond: Assets costing $20,000 or more are added to a general small business pool, depreciated at 15 percent in the first year and 30 percent in subsequent years, on a diminishing value basis.\n\nThird: If the pool balance falls below the threshold at year end, the entire remaining pool balance is immediately deductible.\n\nThe SBE simplified rules are optional but, once adopted, apply to all depreciating assets except those specifically excluded."}
+     ],
+     quiz:[
+      {q:"A business buys a machine for $100,000 with a 5-year effective life. Using the diminishing value method (first year, held all year), the decline in value is:",opts:["$20,000","$40,000","$33,333","$10,000"],ans:1,exp:"DV rate = 200% / 5 = 40%. Decline = $100,000 × 40% = $40,000. Prime cost would give $20,000. DV front-loads deductions in earlier years."},
+      {q:"An SBE purchases a laptop for $1,800 in October 2024 (below the $20,000 threshold). The tax treatment is:",opts:["Added to pool at 15%","Immediately deductible","Depreciated over 4-year effective life","50% deductible in year 1"],ans:1,exp:"SBEs can immediately deduct assets under the $20,000 threshold. The $1,800 laptop is fully deductible in the 2024-25 income year."}
+     ]
+    },
+    {id:"2E",title:"Part E: Trading Stock & International Tax",
+     segs:[
+      {head:"2.19–2.23 Trading Stock Rules",
+       hook:{hl:"ATO Uncovers $220M in Understated Trading Stock (2023)",
+        story:"In 2023, the ATO's retail sector review found systematic undervaluation of closing trading stock — particularly in fashion and electronics. One apparel retailer had excluded import duties and freight from its stock valuation, understating closing stock by $31 million and therefore overstating its cost-of-goods-sold deduction. Amended assessments with penalties followed. The method chosen to value closing trading stock directly affects taxable income every year.",
+        bridge:"Let's work through the trading stock rules under Division 70 of ITAA97."},
+       content:"Trading stock is property manufactured, acquired or held for sale or exchange in the ordinary course of business. Purchases are deductible under section 8-1. Sales are assessable as ordinary income.\n\nDivision 70 requires an additional taxable income adjustment equal to the change in closing trading stock:\nIf closing stock exceeds opening stock — the increase is included in assessable income.\nIf closing stock is less than opening stock — the reduction is an additional deduction.\n\nThree valuation methods for closing stock:\nCost — the historical cost of acquiring the stock.\nMarket selling value — what the stock would sell for in the ordinary course of business.\nReplacement value — what it would cost to replace the stock.\n\nEach item can use a different method, and the method can change year to year. Taxpayers choose the method that minimises taxable income in that year.\n\nDisposal outside the ordinary course of business — such as gifts or sales to associates below market value — is deemed to occur at market value."},
+      {head:"2.24–2.27 International Tax: DTAs, WHT and Transfer Pricing",
+       hook:{hl:"Glencore Settles $1.5B Australian Transfer Pricing Dispute (2024)",
+        story:"In 2024, mining giant Glencore settled a long-running dispute with the ATO for approximately $1.5 billion. The ATO argued that prices Glencore charged its Australian copper mining subsidiary when selling copper to its Swiss trading arm were below arm's-length — artificially reducing Australian profits and tax. The settlement is one of the largest transfer pricing outcomes in Australian history. Transfer pricing rules exist to ensure that cross-border related-party dealings reflect what independent parties would have agreed.",
+        bridge:"Let's understand how double tax agreements, withholding tax, and transfer pricing work in Australia's international tax framework."},
+       content:"Double Tax Agreements are treaties between Australia and other countries to prevent the same income being taxed twice. DTAs allocate taxing rights and provide relief through exemption or tax credits.\n\nWithholding tax is a final tax on income flowing to non-residents. Domestic law rates: dividends 30 percent, interest 10 percent, royalties 30 percent. DTAs commonly reduce these rates significantly.\n\nTransfer pricing: Related parties in different countries can manipulate prices to shift profits to lower-tax jurisdictions. Australia's transfer pricing rules under Subdivision 815-B of ITAA97 require all cross-border related-party dealings to be at arm's length — the price independent parties would have agreed.\n\nIf prices are not arm's-length, the ATO can substitute arm's-length conditions and tax accordingly.\n\nForeign currency: Gains or losses from currency movements on transactions may be assessable or deductible under the foreign currency rules in Division 775."}
+     ],
+     quiz:[
+      {q:"Opening trading stock $80,000, closing stock $95,000. The taxable income adjustment is:",opts:["$15,000 additional deduction","$15,000 included in assessable income","No adjustment","$80,000 assessable"],ans:1,exp:"Closing stock exceeds opening stock by $15,000. That increase is included in assessable income — reflecting that unsold stock cannot all be deducted; it remains an asset of the business."},
+      {q:"An Australian company pays $500,000 royalties to a US company. No DTA applies. Withholding tax remitted to ATO?",opts:["$50,000 (10%)","$75,000 (15%)","$150,000 (30%)","$0"],ans:2,exp:"Domestic WHT rate on royalties to non-residents is 30%. $500,000 × 30% = $150,000. If the Australia-US DTA applied, the rate would reduce to 5% in most cases."}
+     ]
+    }
+   ]
+  },
+  // ---- MODULE 3 ----
+  {id:3,title:"CGT Fundamentals",tag:"tag-m3",
+   parts:[
+    {id:"3A",title:"CGT: Events, Assets, Calculations and Exemptions",
+     segs:[
+      {head:"3.1 & 3.2 CGT Core Concepts and CGT Events",
+       hook:{hl:"ATO Collects Record $2.3B CGT From Property Boom Gains (2024)",
+        story:"In 2024, the ATO reported record CGT collections from residential property, driven by years of price growth. Hundreds of thousands of Australians selling investment properties or converting their home to a rental before selling were required to calculate and declare capital gains. The ATO identified over $840 million in amended assessments where taxpayers had incorrectly calculated their cost base — particularly failing to include stamp duty, legal fees and renovation costs.",
+        bridge:"Let's build a complete understanding of how capital gains tax works — from what triggers it to calculating the final gain."},
+       content:"CGT is not a separate tax — capital gains are included in assessable income and taxed at the taxpayer's marginal rate. The CGT provisions are in Parts 3-1 and 3-3 of ITAA97.\n\nA CGT event is the trigger for a potential gain or loss. There are over 50 CGT events. The most common is CGT Event A1: disposal of a CGT asset — when ownership passes from one entity to another. For Event A1, the event occurs at the time of the contract, not settlement.\n\nOther key events: B1 (use of asset by another entity), C1/C2 (loss or destruction of asset, expiry of rights), D1 (creating contractual rights in another entity), E1/E2 (creating or transferring to a trust), K6 (transactions involving pre-CGT assets).\n\nCGT assets include: any form of property — real estate, shares, units in trusts, options, rights, goodwill, foreign currency, and collectables. Pre-CGT assets acquired before 20 September 1985 are generally exempt."},
+      {head:"3.3 & 3.4 Calculating Capital Gains and Losses",
+       hook:{hl:"Federal Court Rules Crypto Coins Are CGT Assets, Not Currency (2024)",
+        story:"In 2024, the Full Federal Court confirmed that Bitcoin and other cryptocurrencies are CGT assets — not foreign currency. A taxpayer had argued cryptocurrency was currency, hoping for more favourable tax treatment. The Court rejected this, holding cryptocurrency is property — a CGT asset — and every disposal, including exchanging one crypto for another, triggers a CGT event. The taxpayer faced $780,000 in capital gains tax across multiple undisclosed years.",
+        bridge:"Let's work through exactly how capital gains and losses are calculated — including the critical 50% CGT discount."},
+       content:"Capital gain = Capital proceeds minus Cost base.\n\nThe cost base of a CGT asset has five elements:\nElement 1: Amount paid to acquire the asset.\nElement 2: Incidental costs of acquisition — stamp duty, legal fees, brokerage.\nElement 3: Costs of ownership while producing assessable income.\nElement 4: Capital improvements and enhancement expenditure.\nElement 5: Costs of establishing, preserving or defending title.\n\nCapital loss = Reduced cost base minus Capital proceeds. The reduced cost base excludes Element 3 and any previously deducted amounts.\n\nCapital losses can only be offset against capital gains — never against ordinary income. Unused losses are carried forward indefinitely.\n\nCGT Discount: For assets held at least 12 months, individuals and trusts can reduce the capital gain by 50 percent — after applying capital losses. Companies do not receive the CGT discount.\n\nIndexation: For assets acquired before 21 September 1999, the cost base can be indexed using CPI frozen at the September 1999 quarter. Indexation and the discount are alternatives — choose the more beneficial one."},
+      {head:"3.5 Main Residence Exemption and Other Exemptions",
+       hook:{hl:"ATO Challenges Serial 'Main Residence' Claimants (2024)",
+        story:"In 2024, the ATO launched audits on taxpayers who had claimed the main residence exemption on multiple property sales within short periods — some on three properties within five years, each occupied for only three to four months. The ATO denied the exemptions in several cases, finding the taxpayer was carrying on a business of property development — making the gains ordinary income, not even subject to CGT. The main residence exemption requires genuine owner-occupation.",
+        bridge:"The main residence exemption is one of the most valuable CGT concessions available. Let's understand exactly when it applies and its limitations."},
+       content:"The main residence exemption in Subdivision 118-B provides full CGT exemption for a dwelling that was the taxpayer's main residence throughout the entire ownership period.\n\nA 'dwelling' includes a house, apartment, caravan or houseboat, plus up to two hectares of adjacent land used for private purposes.\n\nMain residence is determined by ordinary meaning — where the taxpayer actually lives: time spent there, family location, electoral roll address, connection of utilities, intention.\n\nIf the property was only a main residence for part of the ownership period, or was used for income production (rented out), only a partial exemption applies using this formula:\nCapital gain × (Non-main-residence days / Total ownership days)\n\nAbsence rule: A taxpayer can treat a property as their main residence while absent — up to 6 years if rented during the absence; indefinitely if not used for income production.\n\nForeign resident restriction: From July 2020, foreign residents cannot access the main residence exemption (with limited transitional exceptions)."}
+     ],
+     quiz:[
+      {q:"Tom buys shares in March 2019 for $50,000, sells August 2025 for $80,000. He has $5,000 in carried-forward capital losses. Net capital gain in assessable income?",opts:["$30,000","$25,000","$12,500","$15,000"],ans:2,exp:"Step 1: Gain = $80,000 − $50,000 = $30,000. Step 2: Apply losses: $30,000 − $5,000 = $25,000. Step 3: Held >12 months → 50% CGT discount: $25,000 × 50% = $12,500 assessable."},
+      {q:"A CGT asset contract is signed 15 March 2025; settlement is 20 April 2025. When does CGT Event A1 occur?",opts:["15 March 2025","20 April 2025","30 June 2025","When proceeds received"],ans:0,exp:"CGT Event A1 occurs at the time of the contract — 15 March 2025 — not settlement. The gain is recognised in the income year the contract is made (2024-25)."},
+      {q:"Michelle bought her home in 2015 for $400,000, sold 2025 for $750,000. Lived in it continuously as her main residence. CGT?",opts:["Capital gain $350,000 with 50% discount","$175,000 assessable","Full main residence exemption — no CGT","CGT applies as held over 5 years"],ans:2,exp:"Full main residence exemption applies under Subdivision 118-B because the property was Michelle's main residence for the entire ownership period. No CGT regardless of the gain amount."}
+     ]
+    }
+   ]
+  },
+  // ---- MODULE 4 ----
+  {id:4,title:"Taxation of Individuals",tag:"tag-m4",
+   parts:[
+    {id:"4A",title:"Individual Income, Superannuation, Offsets and Tax Payable",
+     segs:[
+      {head:"4.1–4.3 Individual Income and Employment Termination Payments",
+       hook:{hl:"Executive's $485,000 Redundancy — ATO Disputes Tax-Free Component (2024)",
+        story:"In 2024, a senior mining executive received a $485,000 payment on redundancy after 22 years of service. She and the ATO disagreed on how much qualified as a tax-free genuine redundancy payment versus a taxable employment termination payment. The ATO's position: part of the payment represented contractual entitlements that did not qualify as genuine redundancy, and was therefore taxable at ordinary rates. The difference was over $90,000 in tax. Correctly classifying termination payments is a critical skill.",
+        bridge:"Let's work through the individual income framework — including the special rules for employment termination payments."},
+       content:"For individual taxpayers, assessable income includes: salary and wages, business income, investment income (interest, dividends, rent), and various statutory income items.\n\nEmployment Termination Payments under Division 82 are lump sums paid on termination. They include genuine redundancy payments, golden handshakes, payments in lieu of notice, and compensation for loss of job.\n\nGenuine redundancy payments receive tax-free treatment up to a threshold based on years of service. For 2024-25: $12,524 tax-free base, plus $6,264 per completed year of service. The excess above this amount is an ETP taxed at concessional rates.\n\nETPs not qualifying as genuine redundancy are taxed at maximum 30 percent (plus Medicare levy) if within the ETP cap of $245,000 in 2024-25, and at the top marginal rate above the cap.\n\nThe individual tax equation: Tax payable = (Taxable income × applicable rate) minus Tax offsets, plus Medicare levy, minus credits (PAYG withheld, franking credits)."},
+      {head:"4.5 Superannuation Taxation",
+       hook:{hl:"ATO Targets Super Accounts Over $3M Under Division 296 (2025)",
+        story:"In 2025, the proposed Division 296 tax — an additional 15 percent on earnings within superannuation accounts above $3 million — continued to be debated in Parliament. The ATO's SuperMatch database was already being used to identify potentially affected accounts. Separately, the ATO's 2024 compliance program found over 22,000 individuals had exceeded their concessional contribution caps, facing excess contribution tax. Superannuation is one of the most tax-advantaged structures in Australia — but only within strict limits.",
+        bridge:"Let's understand how superannuation is taxed at each stage: contributions, fund earnings, and withdrawals."},
+       content:"Superannuation is taxed at concessional rates across three stages:\n\nContributions:\nConcessional contributions — employer SG contributions, salary sacrifice, personal deductible contributions — are taxed at 15 percent within the fund. The cap for 2024-25 is $30,000 per year. Excess concessional contributions are included in the individual's assessable income, with a 15 percent offset to avoid double taxation.\nNon-concessional contributions — made from after-tax income — have no tax in the fund. The annual cap is $120,000 in 2024-25.\n\nFund earnings: Investment income and capital gains within a super fund are taxed at 15 percent. A one-third CGT discount applies to assets held over 12 months — effectively 10 percent on long-term gains.\n\nWithdrawals: After age 60, withdrawals from a taxed fund are completely tax-free. Before age 60, the taxable component is taxed at marginal rates less a 15 percent offset for those over preservation age.\n\nDivision 293 tax: An additional 15 percent surcharge applies to concessional contributions for individuals earning over $250,000 (total income plus contributions)."},
+      {head:"4.7 & 4.8 Tax Offsets and Calculating Individual Tax Payable",
+       hook:{hl:"Stage 3 Tax Cuts Deliver Up to $4,529 Annual Saving From July 2024",
+        story:"From 1 July 2024, Australia's Stage 3 tax cuts restructured personal income tax brackets significantly — reducing the 32.5 percent rate to 30 percent across a wider band, and cutting the 19 percent rate to 16 percent. For someone on $100,000, the annual saving was approximately $2,179. Understanding the current tax rates and how to apply them step by step is an essential exam skill for the CPA Australia Taxation module.",
+        bridge:"Let's now work through how to calculate an individual's tax payable from taxable income to the final refund or amount owing."},
+       content:"The 2024-25 resident individual tax rates:\nNil on income from $0 to $18,200.\n16 cents per dollar from $18,201 to $45,000.\n$4,288 plus 30 cents per dollar from $45,001 to $135,000.\n$31,288 plus 37 cents per dollar from $135,001 to $190,000.\n$51,638 plus 45 cents per dollar above $190,000.\nPlus a 2 percent Medicare levy on taxable income.\n\nKey tax offsets that reduce tax payable dollar for dollar:\nLow Income Tax Offset up to $700 for incomes under $37,500, phasing out to nil at $66,667.\nSenior and Pensioners Tax Offset for eligible retirees.\nForeign Income Tax Offset for foreign taxes paid on income also taxed in Australia.\n\nFranking credits: Franked dividends carry credits representing company tax already paid. Shareholders include the gross dividend — cash plus franking credit — in assessable income, and claim the franking credit as an offset. Excess credits are refundable to individuals.\n\nCalculation sequence: (1) Calculate gross tax. (2) Add Medicare levy. (3) Subtract tax offsets. (4) Subtract credits — PAYG withholding, franking credits. (5) Result is a refund or amount owing."}
+     ],
+     quiz:[
+      {q:"In 2024-25, gross tax on $80,000 taxable income (before Medicare levy and offsets) is approximately:",opts:["$14,788","$19,288","$24,000","$9,288"],ans:0,exp:"$4,288 + 30% × ($80,000 − $45,000) = $4,288 + $10,500 = $14,788. Add 2% Medicare levy ($1,600) for total of $16,388 before offsets."},
+      {q:"Angela receives a $10,000 fully franked dividend (company tax rate 30%). Gross assessable amount?",opts:["$10,000","$13,000","$14,286","$7,000"],ans:2,exp:"Franking credit = $10,000 × 30/70 = $4,286. Gross amount = $10,000 + $4,286 = $14,286. The $4,286 is then claimed as a tax offset."},
+      {q:"A genuine redundancy payment after 20 years service (2024-25). The tax-free amount is:",opts:["$0","$12,524 + (20 × $6,264) = $137,804","$300,000 — all genuine redundancy is tax-free","$500,000 — the ETP cap"],ans:1,exp:"Tax-free = $12,524 + (20 × $6,264) = $12,524 + $125,280 = $137,804. The excess above this is an ETP taxed at concessional rates."}
+     ]
+    }
+   ]
+  },
+  // ---- MODULE 5 ----
+  {id:5,title:"Taxation of Various Entities",tag:"tag-m5",
+   parts:[
+    {id:"5A",title:"Part A: SBEs and Partnerships",
+     segs:[
+      {head:"5.1 & 5.2 Small Business Entity Concessions",
+       hook:{hl:"ATO Denies SBE Status to Family Group With $11M Aggregated Turnover (2024)",
+        story:"In 2024, a family group operating through three companies and a trust tried to claim SBE concessions based on each entity individually having turnover below $10 million. The ATO found the entities were 'connected' and 'affiliated' — requiring their turnovers to be aggregated. Combined turnover exceeded $10 million, disqualifying all entities from the SBE regime. The family lost access to small business CGT concessions, simplified depreciation, and the lower company tax rate. The aggregation rules are a serious compliance trap.",
+        bridge:"Let's understand the SBE concessions and the critical aggregation rules that determine eligibility."},
+       content:"A Small Business Entity is generally an entity with aggregated annual turnover under $10 million. Aggregated turnover includes the entity's own turnover plus the annual turnover of connected entities and affiliates.\n\nConnected entity: An entity is connected if one controls the other — directly or indirectly — through a 40 percent or greater interest, or a third entity controls both.\n\nAffiliate: An individual or company that acts or is expected to act in accordance with your directions.\n\nSBE concessions include: simplified depreciation (immediate write-off up to $20,000, pooling above that); simplified trading stock rules; small business income tax offset of 16 percent on business income tax for individuals, up to $1,000; two-year amendment period; and small business CGT concessions.\n\nSmall Business CGT Concessions require: the entity is an SBE; the asset satisfies the active asset test (used in the business for at least half the ownership period or 7.5 years if held over 15 years); and net assets under $6 million for the 15-year and retirement exemptions.\n\nFour SBE CGT concessions: 15-year exemption (full exemption, owner 55-plus and retiring); 50% active asset reduction (on top of CGT discount); retirement exemption (up to $500,000 lifetime, must roll into super if under 55); and rollover relief (defer gain if proceeds reinvested within 2 years)."},
+      {head:"5.4 & 5.5 Partnership Taxation",
+       hook:{hl:"ATO Warns on Partnership Income-Splitting Arrangements (2024)",
+        story:"In 2024, the ATO issued a taxpayer alert targeting professional partnerships — law firms and accounting practices — where partners were allocating high proportions of income to low-income spouses or adult children who were nominally partners but performed little substantive work. The ATO indicated it was considering applying Part IVA to these arrangements. Even legitimate partnerships must have genuine economic substance behind income allocations.",
+        bridge:"Let's examine how partnership income is taxed in Australia — a flow-through structure with specific calculation rules."},
+       content:"A partnership is not a separate taxpaying entity. Net income is calculated at the partnership level using income tax rules, then allocated to partners who are individually assessed.\n\nEach partner includes their share of net income in their own assessable income in the year the partnership earns it — whether or not it is actually distributed.\n\nA partner's share is determined by the partnership agreement. If there is no agreement, partners share equally.\n\nPartnership losses flow through to individual partners proportionately. Loss quarantining rules may limit when partners can use non-primary production losses — particularly the non-commercial loss rules for individuals below $250,000 income.\n\nCapital gains from assets owned by a partnership flow through to partners proportionately. Each partner applies their own CGT calculation, including eligibility for the 50 percent individual CGT discount.\n\nA partner's interest in the partnership is itself a CGT asset. Disposal of a partnership interest triggers CGT Event A1."}
+     ],
+     quiz:[
+      {q:"Smith-Jones partnership net income $200,000. Smith 60%, Jones 40%. Jones also receives a $40,000 salary (already included in the $200,000 net income calculation). What is Jones's assessable share?",opts:["$40,000 salary only","$80,000 — 40% of $200,000","$120,000","$40,000 + $80,000 = $120,000"],ans:1,exp:"Jones's share = 40% × $200,000 = $80,000. This is assessed in Jones's individual return. The salary to Jones is already reflected in the partnership net income calculation — it does not create additional assessable income."},
+      {q:"SBE aggregated annual turnover threshold is:",opts:["$2 million","$5 million","$10 million","$50 million"],ans:2,exp:"The SBE threshold is $10 million aggregated annual turnover, including connected entities and affiliates. Note: Some SBE CGT concessions additionally require net assets under $6 million."}
+     ]
+    },
+    {id:"5B",title:"Part B: Trusts and Companies",
+     segs:[
+      {head:"5.7–5.9 Trust Taxation Framework",
+       hook:{hl:"ATO Issues Section 100A Determinations Against Family Trusts (2023-2024)",
+        story:"In 2023 and 2024, the ATO issued hundreds of section 100A determinations against family discretionary trusts. The targets: trusts that distributed income to adult children or other low-tax beneficiaries, who had informally agreed to give the money back to the trustee or parents. The ATO argued these were reimbursement agreements under section 100A — making the distributions ineffective, with income instead taxed to the trustee at 47 percent. Multiple Federal Court cases followed. Trust taxation is complex and has significant compliance risk.",
+        bridge:"Let's work through the trust taxation framework — one of the most complex and examined areas of Australian tax law."},
+       content:"A trust is not a separate taxpayer. Division 6 of ITAA36 determines who is taxed on trust income.\n\nNet income is calculated at the trust level using income tax rules. This may differ from trust law income defined in the trust deed.\n\nBeneficiaries who are presently entitled to trust income, and not under a legal disability, are assessed on their proportionate share of net income under section 97.\n\nBeneficiaries under a legal disability — such as minors — are taxed through the trustee under section 98.\n\nUndistributed income (no beneficiary presently entitled) is taxed to the trustee: under section 99 at individual marginal rates in some circumstances; under section 99A at 47 percent (the penal rate) in most other cases.\n\nSection 100A: Where a beneficiary is presently entitled but there is an arrangement for the economic benefit to be returned to another person — a reimbursement agreement — the distribution is ineffective. Section 100A provisions apply to tax the trustee instead.\n\nMinor beneficiaries: Division 6AA applies penalty tax rates on unearned trust distributions to minors — up to 47 percent — except for excepted income such as income from a deceased estate."},
+      {head:"5.9–5.12 Company Taxation and Franking",
+       hook:{hl:"ATO Franking Credit Task Force Recovers $1.4B (2024)",
+        story:"In 2024, the ATO's Tax Avoidance Taskforce reported that its review of franking credit manipulation identified $1.4 billion in incorrectly claimed credits. The most common scheme involved share traders selling shares just before the dividend record date — triggering a capital loss — while simultaneously acquiring an equivalent position through derivatives, effectively claiming the franking credits without holding the genuine economic risk. The ATO applied both the holding period rules and Part IVA to deny the credits.",
+        bridge:"Let's understand the company tax framework and the franking system — how company tax integrates with individual shareholders."},
+       content:"Companies are separate taxable entities taxed at a flat rate:\nBase rate entities — passive income less than 80 percent of assessable income AND aggregated turnover under $50 million — are taxed at 25 percent.\nAll other companies pay 30 percent.\n\nCompany taxable income equals assessable income minus deductions. Note: Companies do not get the 50 percent CGT discount.\n\nFranking (Imputation) System: When a company pays income tax and distributes profits as dividends, those dividends carry franking credits representing the tax already paid.\n\nFranking account: A notional account tracking company tax paid (credit) and franking credits attached to dividends paid (debit).\n\nMaximum franking credit per dollar of dividend: for a 30% rate company = dividend × 30/70; for a 25% rate company = dividend × 25/75.\n\nShareholder treatment: Gross up the dividend by adding the franking credit, include the grossed-up amount in assessable income, then claim the franking credit as an offset. Excess franking credits are refundable to individuals.\n\nHolding period rule: Shareholders must hold shares 'at risk' for at least 45 days (90 days for preference shares) around the ex-dividend date to access franking credits."}
+     ],
+     quiz:[
+      {q:"A discretionary trust earns $100,000 net income. Trustee distributes $60,000 to adult beneficiary James, leaves $40,000 undistributed. The $40,000 is taxed:",opts:["Under s. 97 at James's rate","Under s. 99A at 47%","Under s. 99 at individual rates","Not taxed — exempt"],ans:1,exp:"Undistributed trust income where no beneficiary is presently entitled is generally taxed under section 99A at 47% for discretionary trusts. Section 99 may apply where the Commissioner considers it appropriate."},
+      {q:"A base rate company (25% tax rate) pays a $75,000 cash dividend. Maximum franking credit?",opts:["$22,500","$25,000","$32,143","$21,429"],ans:1,exp:"Maximum franking credit = $75,000 × (25/75) = $25,000. Shareholder includes $100,000 ($75,000 + $25,000) in assessable income and claims $25,000 as a tax offset."}
+     ]
+    }
+   ]
+  },
+  // ---- MODULE 6 ----
+  {id:6,title:"GST and FBT Fundamentals",tag:"tag-m6",
+   parts:[
+    {id:"6A",title:"Part A: GST Fundamentals",
+     segs:[
+      {head:"6.1 & 6.2 GST Core Concepts and Types of Supply",
+       hook:{hl:"ATO Finds $500M in Unclaimed GST Input Tax Credits Among SMEs (2024)",
+        story:"In 2024, the ATO found a surprising compliance issue: many small businesses were actually underclaiming input tax credits — leaving hundreds of millions unclaimed — primarily because owners confused input-taxed supplies (no ITC available) with GST-free supplies (full ITC available). A Sydney financial planning firm had mistakenly treated its fee income as input-taxed and denied itself $180,000 in ITCs over three years. The difference between GST-free and input-taxed is one of the most examined distinctions in the entire CPA taxation syllabus.",
+        bridge:"Let's build a complete picture of how GST works in Australia — from the basic framework to the four types of supply."},
+       content:"GST is a broad-based consumption tax of 10 percent on most goods and services supplied in Australia.\n\nRegistration: Entities must register for GST when annual turnover meets or exceeds $75,000 ($150,000 for non-profit bodies). Registration is voluntary below these thresholds.\n\nGST is ultimately borne by the end consumer, collected at each stage of the supply chain. Registered businesses claim input tax credits for GST paid on business inputs, making GST effectively a value-added tax.\n\nFour types of supply:\n\nTaxable supply: 10 percent GST charged. Full ITC available to the acquirer.\n\nGST-free supply: No GST charged, but full ITC available on inputs. Examples: basic unprocessed food, medical and health services, education, exports, water and sewerage.\n\nInput-taxed supply: No GST charged, but NO ITC available on related inputs. Examples: financial supplies such as bank fees and interest, residential rent, sale of residential premises.\n\nOutside the scope: Not a supply at all — wages, dividends.\n\nCritical distinction: A financial planning firm charging advice fees makes taxable supplies — GST applies and full ITCs are available. A bank providing a loan makes an input-taxed supply — no GST, but also no ITCs on related costs."},
+      {head:"6.3 & 6.4 Input Tax Credits and Attribution",
+       hook:{hl:"Developer Loses $800K ITC Claim on Mixed Residential/Commercial Project (2023)",
+        story:"In 2023, a Melbourne developer sought full input tax credits on construction costs for a building comprising residential apartments and retail shops. The ATO determined the residential component was 70 percent of the development. The developer was only entitled to ITCs on the 30 percent attributable to the commercial retail areas — the residential GST was not creditable, as it related to making input-taxed supplies.",
+        bridge:"Let's examine the rules for claiming input tax credits — and how to calculate them when supplies are mixed."},
+       content:"Input tax credits allow registered entities to recover GST paid on business inputs.\n\nA creditable acquisition arises when: the entity acquires something solely or partly for a creditable purpose; the supply is taxable; consideration is provided; and the entity is registered.\n\nCreditable purpose means acquiring for the purpose of making taxable or GST-free supplies. Acquiring for input-taxed supplies is NOT a creditable purpose.\n\nFor a partly creditable acquisition: ITC equals the full ITC multiplied by the extent of creditable purpose as a percentage.\n\nSpecial rules: Input tax credits may be available on second-hand goods purchased from non-registered individuals for resale. On importations, GST paid gives rise to a creditable importation with an equivalent ITC if the import is for a creditable purpose.\n\nGST attribution — when to account:\nCash basis: GST attributed in the tax period when payment is received or made.\nAccruals basis: GST attributed when the invoice is issued or received.\n\nTax invoices are required for ITCs on acquisitions over $82.50. A valid tax invoice must include the supplier's ABN, description of supply, GST amount or statement that price includes GST, the date, and supplier identity."},
+      {head:"6.5 GST Administration — BAS, Margin Scheme and Property",
+       hook:{hl:"ATO Cancels 12,500 GST Registrations in Fraud Crackdown (2024)",
+        story:"In 2024, the ATO cancelled over 12,500 GST registrations after finding businesses had registered without meeting the $75,000 threshold, then lodged fraudulent BAS statements claiming large refunds. The ATO's fraud detection system identified suspicious patterns — large refund claims in first quarters with no corresponding taxable sales. GST administration is closely monitored, and the consequences for incorrect BAS reporting include penalties, cancellation, and prosecution.",
+        bridge:"Let's cover the administrative framework for GST — BAS lodgement, tax periods, and the property-specific rules."},
+       content:"Business Activity Statements are lodged to report and pay GST. Net GST equals GST collected on sales minus ITCs on purchases — either a net amount payable or a refund.\n\nGST tax periods: quarterly for most businesses under $20 million turnover; monthly for businesses $20 million and above or those receiving regular refunds; annual for some very small businesses.\n\nMargin scheme under Division 75: Available for the sale of real property where the vendor acquired the property without entitlement to a full ITC. GST is calculated on the margin — sale price minus acquisition cost — rather than the full sale price.\n\nGST and property rules:\nSale of new residential premises — taxable.\nSale of existing residential premises — input-taxed.\nSale of commercial property — taxable.\nResidential rent — input-taxed.\nCommercial rent — taxable.\n\nGoing concern exemption: The sale of a going concern is GST-free if both parties are registered for GST and the sale includes everything necessary to carry on the enterprise."}
+     ],
+     quiz:[
+      {q:"A restaurant sells a meal for $110 GST-inclusive, buys ingredients for $44 GST-inclusive. Net GST payable to ATO?",opts:["$10","$6","$4","$11"],ans:1,exp:"GST collected: $110/11 = $10. ITC on inputs: $44/11 = $4. Net GST = $10 − $4 = $6. GST is a value-added tax — each stage only effectively pays tax on value added."},
+      {q:"Which supply is input-taxed (not GST-free)?",opts:["Export of goods to Japan","Basic unprocessed food at supermarket","Monthly interest earned by a bank on home loans","Private school tuition"],ans:2,exp:"Financial supplies including bank interest income are input-taxed — no GST, no ITCs on related costs. Exports are GST-free (full ITCs). Basic food and education are also GST-free."},
+      {q:"Compulsory GST registration threshold for a general business?",opts:["$50,000","$75,000","$100,000","$150,000"],ans:1,exp:"$75,000 annual turnover triggers compulsory registration for most entities. $150,000 applies to non-profit bodies. Registration must occur within 21 days of crossing the threshold."}
+     ]
+    },
+    {id:"6B",title:"Part B: FBT Fundamentals",
+     segs:[
+      {head:"6.6 & 6.7 FBT Core Concepts and Benefit Types",
+       hook:{hl:"ATO FBT Audit Recovers $280M on Cars and Entertainment (2024)",
+        story:"In 2024, the ATO's FBT compliance program focused on company cars and entertainment expenses. Common issues: employers using the statutory formula method with incorrect base values; failure to include private use of pool cars; and entertainment classified as a business expense when it was actually provided to employees. One law firm failed to declare $1.2 million in employee entertainment benefits over three years, resulting in $580,000 in FBT liability plus penalties.",
+        bridge:"FBT is paid by employers on non-cash benefits given to employees. Let's understand how it works."},
+       content:"Fringe Benefits Tax is paid by employers on the taxable value of fringe benefits provided to employees or their associates. The FBT year runs from 1 April to 31 March.\n\nFBT rate: 47 percent — aligned with the top marginal rate plus Medicare levy. This prevents circumventing income tax through non-cash benefits.\n\nA fringe benefit is a benefit provided to an employee in respect of their employment, other than a salary or wages payment.\n\nFBT taxable value is grossed up before applying the 47 percent rate:\nType 1 gross-up factor of 2.0802 applies where the employer is entitled to an ITC on the benefit.\nType 2 gross-up factor of 1.8868 applies where no ITC is available.\nFBT equals taxable value multiplied by gross-up factor multiplied by 47 percent.\n\nKey benefit types:\nCar fringe benefit: Private use of an employer-provided car. Two methods — statutory formula (Cost × 20% × days available / 365) or operating cost method (total costs × private use percentage).\nExpense payment: Employer pays or reimburses employee personal expenses.\nLoan benefit: Below-market interest rate loan — taxable value is the interest savings.\nHousing benefit: Employer-provided accommodation.\nLiving-away-from-home allowance: Specific rules and strict substantiation requirements."},
+      {head:"6.8 FBT Exemptions and the Otherwise Deductible Rule",
+       hook:{hl:"ATO Rules Work Laptop Exempt, But Personal iPad Not (2024)",
+        story:"In 2024, the ATO clarified employer confusion via a taxpayer alert: providing an employee with a laptop for work purposes is FBT-exempt as a work-related item. However, where an employer provided an iPad predominantly used for gaming and personal entertainment — evidenced by the apps installed and usage data — the ATO determined it was not a work-related item and FBT applied. The primary use test is the key determinant.",
+        bridge:"FBT has many exemptions that can dramatically reduce an employer's liability. Let's cover the key ones."},
+       content:"Key FBT exemptions:\n\nWork-related items: Laptops, tablets, mobile phones, calculators, protective clothing — exempt if provided primarily for use in the employee's employment. Limit: one of each type per employee per FBT year.\n\nMinor benefits: A benefit with a taxable value under $300 that is provided irregularly and infrequently. Cannot apply to recurring entertainment.\n\nIn-house benefits: Benefits from the employer's normal business (staff discounts on goods the employer sells) receive a 75 percent reduction in taxable value.\n\nOtherwise deductible rule: If the employee would have been entitled to a full deduction for the expense had they paid it personally, the FBT liability is reduced to nil. This is why a laptop provided 100 percent for work has no FBT — the employee could have deducted the cost.\n\nExempt employers: Public hospitals, public ambulance services and certain charities can provide employees with up to $17,000 in grossed-up exempt benefits per year — enabling significant salary packaging benefits.\n\nFBT reporting: Employers lodge an annual FBT return (due 21 May or later with a tax agent). FBT paid by employers is itself tax-deductible. Reportable fringe benefits exceeding $2,000 per employee must appear on the payment summary and affect the employee's income for surcharge and offset purposes."}
+     ],
+     quiz:[
+      {q:"An employer provides a car with a cost of $60,000, available all year. Statutory formula taxable value?",opts:["$12,000","$60,000","$28,000","$6,000"],ans:0,exp:"Statutory formula: $60,000 × 20% × (365/365) = $12,000. FBT payable would then be $12,000 × 2.0802 (Type 1) × 47% ≈ $11,732."},
+      {q:"Employer pays an employee's private gym membership ($1,500/year). Does the otherwise deductible rule apply?",opts:["Yes — health expenses are always deductible","No — gym memberships are private expenses, not deductible by employee","Yes — but only 50%","Exempt as minor benefit"],ans:1,exp:"The otherwise deductible rule reduces FBT only where the employee could have deducted the expense. A private gym membership is personal — not deductible by the employee. Full FBT applies."},
+      {q:"A public hospital (exempt employer) salary packages $16,000 for a nurse. FBT outcome?",opts:["Full FBT at 47%","FBT on the excess over $9,010","FBT-exempt — eligible employer, within $17,000 cap","Exempt only if nurse lives 100km+ from hospital"],ans:2,exp:"Eligible exempt employers including public hospitals can provide employees with up to $17,000 in grossed-up benefits exempt from FBT. $16,000 is within this cap — fully exempt."}
+     ]
+    }
+   ]
+  }
+ ]
+};
+
+// ================================================================
+//  STATE
+// ================================================================
+let curMod=0, curPart=0, curSeg=0, inQuiz=false;
+let completedParts = new Set();
+let quizIdx=0, quizCorrect=0, quizWrong=0;
+let curMode = 'lecturer';
+let curVoice = 'onyx';
+let speechSpeed = 0.92;
+let audioQueue = [];
+let queueRunning = false;
+let currentAudio = null;
+let isPaused = false;
+let pauseTimer = null;
+
+// ================================================================
+//  API KEY
+// ================================================================
+var openaiKey = '';
+try { openaiKey = localStorage.getItem('oai_key') || ''; } catch(e) { openaiKey = ''; }
+
+function showKeyModal() {
+  document.getElementById('keyModal').style.display = 'flex';
+  document.getElementById('keyInput').value = '';
+  document.getElementById('keyError').style.display = 'none';
+}
+
+function hideKeyModal() {
+  document.getElementById('keyModal').style.display = 'none';
+}
+
+function saveKey() {
+  var val = document.getElementById('keyInput').value.trim();
+  // Strip any accidental spaces, newlines, or invisible chars mobile keyboards add
+  val = val.replace(/[\s\u200B\uFEFF]/g, '');
+  if (!val.startsWith('sk-') || val.length < 20) {
+    var errEl = document.getElementById('keyError');
+    errEl.textContent = 'Key must start with sk- and be at least 20 characters. Got: ' + val.substring(0, 8) + '...';
+    errEl.style.display = 'block';
+    return;
+  }
+  openaiKey = val;
+  try { localStorage.setItem('oai_key', val); } catch(e) {}
+  // Save proxy URL if provided
+  var proxyVal = document.getElementById('proxyInput') ? document.getElementById('proxyInput').value.trim() : '';
+  if (proxyVal) {
+    PROXY_URL = proxyVal;
+    try { localStorage.setItem('proxy_url', proxyVal); } catch(e) {}
+  }
+  hideKeyModal();
+  setStatus('ready', 'Key saved! Press Play on any section to begin.');
+}
+
+async function testKey() {
+  var val = document.getElementById('keyInput').value.trim();
+  if (!val.startsWith('sk-') || val.length < 20) {
+    document.getElementById('keyError').style.display = 'block';
+    return;
+  }
+  setStatus('loading', 'Testing key...');
+  try {
+    var resp = await callTTS('Hello, your CPA study app is ready to go.', val);
+    if (resp.ok) {
+      document.getElementById('keyInput').style.borderColor = 'var(--green)';
+      setStatus('ready', 'Key works! Click Save and Start.');
+      var blob = await resp.blob();
+      var url = URL.createObjectURL(blob);
+      var a = new Audio(url);
+      a.play();
+    } else {
+      var err = await resp.json();
+      setStatus('error', 'Key error: ' + (err.error ? err.error.message : 'Invalid key'));
+    }
+  } catch(e) {
+    setStatus('error', 'Network error — check your connection');
+  }
+}
+
+// ================================================================
+//  OPENAI TTS
+// ================================================================
+// Cloudflare Worker proxy URL — Worker holds the API key securely
+var PROXY_URL = '';
+try { PROXY_URL = localStorage.getItem('proxy_url') || ''; } catch(e) {}
+
+function callTTS(text, key) {
+  var useProxy = PROXY_URL && PROXY_URL.length > 0;
+  var endpoint = useProxy ? PROXY_URL : 'https://api.openai.com/v1/audio/speech';
+  var headers = { 'Content-Type': 'application/json' };
+  // Only send Authorization if calling OpenAI directly (desktop)
+  if (!useProxy) {
+    headers['Authorization'] = 'Bearer ' + (key || openaiKey);
+  }
+  return fetch(endpoint, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+      model: 'tts-1',
+      input: text,
+      voice: curVoice,
+      speed: speechSpeed
+    })
+  });
+}
+
+// ================================================================
+//  TEXT PROCESSING — helper functions
+// ================================================================
+function isKeyFact(s) {
+  var patterns = [
+    'deductible','assessable','exempt','taxable','must','cannot',
+    'never','always','threshold','cap is','limit','rate is','percent',
+    'section','years','days','months','dollars'
+  ];
+  var lower = s.toLowerCase();
+  for (var i = 0; i < patterns.length; i++) {
+    if (lower.indexOf(patterns[i]) !== -1) return true;
+  }
+  if (/\$[\d,]+/.test(s)) return true;
+  if (/\d+\s*%/.test(s)) return true;
+  return false;
+}
+
+function getNumber(s) {
+  var m = s.match(/\$[\d,]+/);
+  if (m) return m[0];
+  m = s.match(/\d+\s*%/);
+  if (m) return m[0];
+  m = s.match(/\d+\s*(years?|days?|months?)/i);
+  if (m) return m[0];
+  return null;
+}
+
+function splitToSentences(text) {
+  var result = [];
+  var cleaned = text.replace(/\n+/g, ' ');
+  var parts = cleaned.split(/[.!?]+/);
+  for (var i = 0; i < parts.length; i++) {
+    var s = parts[i].trim();
+    if (s.length > 4) result.push(s);
+  }
+  return result;
+}
+
+// ================================================================
+//  5 DELIVERY MODES — return array of {text, pause}
+// ================================================================
+function processLecturer(hook, bridge, concept) {
+  var items = [];
+  items.push({text: 'Here is a real-world example that shows exactly why this topic matters.', pause: 200});
+  var hs = splitToSentences(hook);
+  for (var i = 0; i < hs.length; i++) items.push({text: hs[i], pause: 150});
+  items.push({text: bridge, pause: 400});
+  items.push({text: 'Now let us examine the concept.', pause: 300});
+  var cs = splitToSentences(concept);
+  for (var i = 0; i < cs.length; i++) {
+    var s = cs[i];
+    if (isKeyFact(s)) {
+      items.push({text: 'Note carefully. ' + s, pause: 300});
+      var n = getNumber(s);
+      if (n) items.push({text: 'Remember that figure. ' + n + '.', pause: 350});
+    } else {
+      items.push({text: s, pause: 120});
+    }
+  }
+  items.push({text: 'That completes this section.', pause: 0});
+  return items;
+}
+
+function processPodcast(hook, bridge, concept) {
+  var items = [];
+  var opens = ['Alright!', 'OK so!', 'Right.', 'Good.'];
+  items.push({text: opens[Math.floor(Math.random() * opens.length)] + ' Before we get into the theory, here is something that actually happened.', pause: 180});
+  var hs = splitToSentences(hook);
+  for (var i = 0; i < hs.length; i++) items.push({text: hs[i], pause: 130});
+  items.push({text: "And that is exactly what we are covering today. " + bridge, pause: 350});
+  items.push({text: 'Here is the breakdown.', pause: 200});
+  var transitions = ['Moving on.', 'And here is the next piece.', 'So, importantly.', 'Now get this.', 'Here is where it clicks.'];
+  var ti = 0;
+  var cs = splitToSentences(concept);
+  for (var i = 0; i < cs.length; i++) {
+    var s = cs[i];
+    if (isKeyFact(s)) {
+      items.push({text: 'And this is the part you really need to know. ' + s, pause: 280});
+      var n = getNumber(s);
+      if (n) items.push({text: 'Say that number back to yourself. ' + n + '.', pause: 320});
+    } else {
+      items.push({text: s, pause: 100});
+    }
+    if ((i + 1) % 4 === 0 && ti < transitions.length) {
+      items.push({text: transitions[ti], pause: 150});
+      ti++;
+    }
+  }
+  items.push({text: 'And that is this section wrapped up. Great work!', pause: 0});
+  return items;
+}
+
+function processStoryteller(hook, bridge, concept) {
+  var items = [];
+  items.push({text: 'Picture this.', pause: 600});
+  var hs = splitToSentences(hook);
+  for (var i = 0; i < hs.length; i++) items.push({text: hs[i], pause: 280});
+  items.push({text: bridge, pause: 700});
+  items.push({text: 'Now. Here is where it gets interesting.', pause: 500});
+  var keyFacts = [];
+  var cs = splitToSentences(concept);
+  for (var i = 0; i < cs.length; i++) {
+    var s = cs[i];
+    if (isKeyFact(s)) {
+      keyFacts.push(s);
+      items.push({text: 'Listen carefully. ' + s, pause: 450});
+      var n = getNumber(s);
+      if (n) items.push({text: 'Remember that number. ' + n + '.', pause: 500});
+    } else {
+      items.push({text: s, pause: 220});
+    }
+  }
+  if (keyFacts.length > 0) {
+    items.push({text: 'And of everything we just covered... this is what you must remember.', pause: 500});
+    items.push({text: keyFacts[0], pause: 0});
+  }
+  return items;
+}
+
+function processSpeedRun(hook, bridge, concept) {
+  var items = [];
+  var hs = splitToSentences(hook);
+  var last = hs[hs.length - 1] || hs[0];
+  items.push({text: 'Quick context. ' + last, pause: 100});
+  items.push({text: bridge, pause: 120});
+  items.push({text: 'Key rules.', pause: 100});
+  var cs = splitToSentences(concept);
+  for (var i = 0; i < cs.length; i++) items.push({text: cs[i], pause: 60});
+  items.push({text: 'Section done.', pause: 0});
+  return items;
+}
+
+function processDrill(hook, bridge, concept) {
+  var items = [];
+  var hs = splitToSentences(hook);
+  var last = hs[hs.length - 1] || hs[0];
+  items.push({text: 'Context. ' + last, pause: 350});
+  items.push({text: 'Core rules. Commit these to memory.', pause: 300});
+  var cs = splitToSentences(concept);
+  for (var i = 0; i < cs.length; i++) {
+    var s = cs[i];
+    if (isKeyFact(s)) {
+      items.push({text: 'Rule. ' + s, pause: 420});
+      var n = getNumber(s);
+      if (n) items.push({text: 'Memorise. ' + n + '. Again. ' + n + '.', pause: 500});
+    } else {
+      items.push({text: s, pause: 180});
+    }
+  }
+  items.push({text: 'Drill complete. Review any rules that were new.', pause: 0});
+  return items;
+}
+
+var PROCESSORS = {
+  lecturer: processLecturer,
+  podcast: processPodcast,
+  storyteller: processStoryteller,
+  speedrun: processSpeedRun,
+  drill: processDrill
+};
+
+// ================================================================
+//  AUDIO QUEUE ENGINE — Primed Audio Element (mobile-safe)
+// ================================================================
+
+// A single Audio element primed during user gesture — reused for all playback
+// This is the only reliable way to play async-fetched audio on Android
+var primedAudio = null;
+var isMobileBrowser = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// Silent 1-frame WAV — used to unlock the audio element during user gesture
+var SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+
+function primeAudioElement() {
+  if (!primedAudio) {
+    primedAudio = new Audio();
+    primedAudio.preload = 'auto';
+  }
+  // Play silent audio during user gesture to unlock the element
+  primedAudio.src = SILENT_WAV;
+  var playPromise = primedAudio.play();
+  if (playPromise) {
+    playPromise.catch(function(e) {
+      showDebug('Audio prime failed: ' + e.message + '. Try Chrome browser.');
+    });
+  }
+}
+
+async function speakCurrent() {
+  if (!openaiKey) { showKeyModal(); return; }
+  stopAudio();
+  // MUST prime during user gesture (this function is called directly from onclick)
+  primeAudioElement();
+  var seg = SD.modules[curMod].parts[curPart].segs[curSeg];
+  var processor = PROCESSORS[curMode];
+  var items = processor(seg.hook.story, seg.hook.bridge, seg.content);
+  audioQueue = items.slice();
+  queueRunning = true;
+  isPaused = false;
+  document.getElementById('playBtn').textContent = '\u23F8';
+  setPulse('active');
+  showDebug('');
+  await runAudioQueue();
+}
+
+async function fetchBlob(item) {
+  // Fetch and return a blob for a queue item, or null on error
+  try {
+    var resp = await callTTS(item.text);
+    if (!resp.ok) {
+      var errText = await resp.text();
+      var errMsg = 'API error ' + resp.status;
+      try { errMsg = JSON.parse(errText).error.message; } catch(e) {}
+      if (resp.status === 401) errMsg = 'Invalid key — tap API Key to update';
+      if (resp.status === 429) errMsg = 'Quota exceeded — check billing';
+      setStatus('error', errMsg);
+      return null;
+    }
+    var blob = await resp.blob();
+    if (blob.size < 100) return null;
+    return blob;
+  } catch(e) {
+    showDebug('Fetch error: ' + e.message);
+    setStatus('error', 'Network error: ' + e.message);
+    return null;
+  }
+}
+
+async function runAudioQueue() {
+  // Pre-fetch next blob while current one plays
+  var nextBlobPromise = audioQueue.length > 0 ? fetchBlob(audioQueue[0]) : null;
+
+  while (audioQueue.length > 0 && queueRunning) {
+    var item = audioQueue.shift();
+    if (!item.text || !item.text.trim()) {
+      if (audioQueue.length > 0) nextBlobPromise = fetchBlob(audioQueue[0]);
+      continue;
+    }
+
+    setStatus('loading', 'Fetching audio...');
+    setLoadBar(true);
+
+    // Wait for current blob (already pre-fetched)
+    var blob = await nextBlobPromise;
+
+    // Start pre-fetching the NEXT one immediately
+    if (audioQueue.length > 0) {
+      nextBlobPromise = fetchBlob(audioQueue[0]);
+    } else {
+      nextBlobPromise = null;
+    }
+
+    if (!queueRunning) break;
+    if (!blob) { finishQueue(); return; }
+
+    setLoadBar(false);
+    setStatus('playing', item.text.substring(0, 55) + (item.text.length > 55 ? '...' : ''));
+    setPulse('active');
+    await playBlob(blob);
+    if (!queueRunning) break;
+    if (item.pause > 0) await sleep(item.pause);
+  }
+  if (queueRunning) finishQueue();
+}
+
+function playBlob(blob) {
+  return new Promise(function(resolve) {
+    var url = URL.createObjectURL(blob);
+
+    function cleanup() {
+      setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+      resolve();
+    }
+
+    if (primedAudio) {
+      // Reuse primed element — already unlocked by user gesture
+      primedAudio.onended = cleanup;
+      primedAudio.onerror = function(e) {
+        showDebug('Audio error: ' + (e.message || primedAudio.error && primedAudio.error.message || 'unknown'));
+        cleanup();
+      };
+      primedAudio.src = url;
+      primedAudio.volume = 1;
+      var p = primedAudio.play();
+      if (p) {
+        p.then(function() {
+          showDebug('');
+        }).catch(function(e) {
+          showDebug('play() blocked: ' + e.message + '. Open in Chrome & allow audio.');
+          cleanup();
+        });
+      }
+    } else {
+      // Fallback: fresh Audio element
+      var a = new Audio(url);
+      a.onended = cleanup;
+      a.onerror = cleanup;
+      a.play().catch(function(e) {
+        showDebug('Fallback play blocked: ' + e.message);
+        cleanup();
+      });
+    }
+  });
+}
+
+function sleep(ms) {
+  return new Promise(function(resolve) { pauseTimer = setTimeout(resolve, ms); });
+}
+
+function finishQueue() {
+  queueRunning = false;
+  document.getElementById('playBtn').textContent = '\u25B6';
+  setPulse('stopped');
+  setLoadBar(false);
+  setStatus('ready', 'Reading complete — press Play to repeat');
+}
+
+function stopAudio() {
+  queueRunning = false;
+  audioQueue = [];
+  if (primedAudio) {
+    try { primedAudio.pause(); primedAudio.src = ''; } catch(e) {}
+  }
+  if (pauseTimer) { clearTimeout(pauseTimer); pauseTimer = null; }
+  isPaused = false;
+  document.getElementById('playBtn').textContent = '\u25B6';
+  setPulse('stopped');
+  setLoadBar(false);
+}
+
+function togglePlay() {
+  if (!openaiKey) { showKeyModal(); return; }
+  if (queueRunning && !isPaused) {
+    if (primedAudio) primedAudio.pause();
+    isPaused = true;
+    queueRunning = false;
+    document.getElementById('playBtn').textContent = '\u25B6';
+    setPulse('stopped');
+    setStatus('ready', 'Paused');
+  } else if (isPaused && primedAudio) {
+    primedAudio.play().catch(function(e) { showDebug('Resume blocked: ' + e.message); });
+    isPaused = false;
+    queueRunning = true;
+    document.getElementById('playBtn').textContent = '\u23F8';
+    setPulse('active');
+    setStatus('playing', 'Resumed');
+    primedAudio.onended = async function() {
+      if (!queueRunning) return;
+      await runAudioQueue();
+    };
+  } else {
+    speakCurrent();
+  }
+}
+
+// ================================================================
+//  UI HELPERS
+// ================================================================
+function setStatus(type, text) {
+  var lbl = document.getElementById('vStatusLabel');
+  var txt = document.getElementById('vStatusText');
+  var labels = {ready:'Ready', loading:'Generating audio...', playing:'Now playing', error:'Error'};
+  var colors = {ready:'var(--muted)', loading:'var(--blue)', playing:'var(--gold)', error:'var(--red)'};
+  lbl.style.color = colors[type] || 'var(--muted)';
+  lbl.textContent = labels[type] || type;
+  txt.textContent = text;
+}
+
+function setPulse(state) {
+  document.getElementById('pulse').className = 'readingPulse ' + state;
+}
+
+function setLoadBar(on) {
+  document.getElementById('loadBar').className = on ? 'loading' : '';
+}
+
+function updateSpeed(v) {
+  speechSpeed = parseFloat(v);
+  document.getElementById('speedLabel').textContent = parseFloat(v).toFixed(1) + 'x';
+}
+
+// Debug panel — visible on screen for mobile troubleshooting
+function showDebug(msg) {
+  var el = document.getElementById('debugPanel');
+  if (!el) return;
+  if (!msg) { el.style.display = 'none'; return; }
+  el.textContent = 'Debug: ' + msg;
+  el.style.display = 'block';
+}
+
+// ================================================================
+//  MODE & VOICE
+// ================================================================
+function setMode(mode) {
+  curMode = mode;
+  document.querySelectorAll('.vModeBtn').forEach(function(b) { b.classList.remove('vActive'); });
+  document.querySelector('.mode-' + mode).classList.add('vActive');
+  if (queueRunning) { stopAudio(); speakCurrent(); }
+}
+
+function setVoice(voice) {
+  curVoice = voice;
+  document.querySelectorAll('.vCharBtn').forEach(function(b) { b.classList.remove('vActive'); });
+  document.querySelector('[data-voice="' + voice + '"]').classList.add('vActive');
+  if (queueRunning) { stopAudio(); speakCurrent(); }
+}
+
+// ================================================================
+//  MODULE / PART / LECTURE
+// ================================================================
+function selectModule(mi) {
+  curMod = mi; curPart = 0; curSeg = 0; inQuiz = false;
+  document.querySelectorAll('.mBtn').forEach(function(b, i) { b.classList.toggle('active', i === mi); });
+  buildPartBar(); loadLecture();
+}
+
+function buildPartBar() {
+  var m = SD.modules[curMod];
+  var pb = document.getElementById('partBar');
+  pb.innerHTML = '';
+  m.parts.forEach(function(p, i) {
+    var b = document.createElement('button');
+    b.className = 'pBtn' + (i === curPart ? ' active' : '') + (completedParts.has(curMod + '-' + i) ? ' done' : '');
+    b.textContent = p.title;
+    b.onclick = (function(idx) {
+      return function() {
+        curPart = idx; curSeg = 0; inQuiz = false;
+        document.querySelectorAll('.pBtn').forEach(function(x, j) { x.classList.toggle('active', j === idx); });
+        loadLecture();
+      };
+    })(i);
+    pb.appendChild(b);
+  });
+}
+
+function loadLecture() {
+  stopAudio();
+  document.getElementById('partComplete').style.display = 'none';
+  document.getElementById('quizView').style.display = 'none';
+  document.getElementById('lectureView').style.display = 'block';
+  renderLectureSegment();
+}
+
+function renderLectureSegment() {
+  var m = SD.modules[curMod];
+  var p = m.parts[curPart];
+  var seg = p.segs[curSeg];
+  var lv = document.getElementById('lectureView');
+  var dots = p.segs.map(function(_, i) {
+    return '<div class="segDot ' + (i < curSeg ? 'done' : i === curSeg ? 'active' : '') + '"></div>';
+  }).join('');
+  var prevBtn = curSeg > 0 ? '<button class="btn btn-ghost" onclick="prevSeg()">&#8592; Back</button>' : '';
+  var nextBtn = curSeg < p.segs.length - 1
+    ? '<button class="btn btn-blue" onclick="nextSeg()">Next Section &#8594;</button>'
+    : '<button class="btn btn-green" onclick="partDone()">Part Complete &#10003;</button>';
+  lv.innerHTML =
+    '<div style="margin-bottom:9px">' +
+      '<span class="tag ' + m.tag + '">' + m.title + '</span>' +
+      '<span style="color:var(--muted);font-size:0.76rem;margin-left:7px">' + p.title + '</span>' +
+    '</div>' +
+    '<div class="segProgress">' + dots + '</div>' +
+    '<div class="hookBox">' +
+      '<div class="hookLabel">🗞️ Before we start — here\'s why this matters</div>' +
+      '<div class="hookHead">' + seg.hook.hl + '</div>' +
+      '<div class="hookBody">' + seg.hook.story + '</div>' +
+      '<div class="hookBridge">' + seg.hook.bridge + '</div>' +
+    '</div>' +
+    '<div class="conceptBox">' +
+      '<div class="conceptLabel">📖 The Concept</div>' +
+      '<div class="conceptHead">' + seg.head + '</div>' +
+      '<div class="conceptBody">' + seg.content + '</div>' +
+    '</div>' +
+    '<div class="navBtns">' +
+      prevBtn +
+      '<button class="btn btn-gold" onclick="speakCurrent()">&#9654; Read Aloud</button>' +
+      nextBtn +
+    '</div>';
+  setStatus('ready', seg.head);
+}
+
+function prevSeg() { curSeg = Math.max(0, curSeg - 1); stopAudio(); renderLectureSegment(); }
+function nextSeg() { curSeg = Math.min(SD.modules[curMod].parts[curPart].segs.length - 1, curSeg + 1); stopAudio(); renderLectureSegment(); }
+
+function partDone() {
+  stopAudio();
+  completedParts.add(curMod + '-' + curPart);
+  buildPartBar();
+  document.getElementById('lectureView').style.display = 'none';
+  document.getElementById('quizView').style.display = 'none';
+  document.getElementById('ssPicker').style.display = 'none';
+  var p = SD.modules[curMod].parts[curPart];
+  document.getElementById('pcTitle').textContent = p.title + ' — Complete!';
+  document.getElementById('partComplete').style.display = 'block';
+}
+
+function repeatWhole() { curSeg = 0; document.getElementById('ssPicker').style.display = 'none'; loadLecture(); speakCurrent(); }
+
+function showSsPicker() {
+  var p = SD.modules[curMod].parts[curPart];
+  var sp = document.getElementById('ssPicker');
+  sp.style.display = 'block';
+  var html = '<div class="ssPickHead">Choose a section to revisit:</div>';
+  p.segs.forEach(function(s, i) {
+    html += '<button class="ssPickBtn" onclick="jumpToSeg(' + i + ')">' + s.head + '</button>';
+  });
+  sp.innerHTML = html;
+}
+
+function jumpToSeg(i) { curSeg = i; loadLecture(); speakCurrent(); }
+
+// ================================================================
+//  QUIZ
+// ================================================================
+function startQuiz() {
+  stopAudio(); inQuiz = true; quizIdx = 0; quizCorrect = 0; quizWrong = 0;
+  document.getElementById('partComplete').style.display = 'none';
+  document.getElementById('lectureView').style.display = 'none';
+  document.getElementById('quizView').style.display = 'block';
+  renderQuizQ();
+}
+
+function renderQuizQ() {
+  var p = SD.modules[curMod].parts[curPart];
+  var qs = p.quiz;
+  var qv = document.getElementById('quizView');
+  if (quizIdx >= qs.length) {
+    var pct = Math.round((quizCorrect / qs.length) * 100);
+    var em = pct >= 80 ? '🎉' : pct >= 60 ? '💪' : '📖';
+    var nextBtn = nextPartExists() ? '<button class="btn btn-gold" onclick="goNextPart()">Next Part &#8594;</button>' : '';
+    qv.innerHTML =
+      '<div class="qComplete">' +
+        '<div style="font-size:1.8rem">' + em + '</div>' +
+        '<div class="qScore">' + quizCorrect + '/' + qs.length + '</div>' +
+        '<div class="qScoreSub">' + pct + '% &mdash; ' + (pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good &mdash; review the ones you missed.' : 'Keep revisiting this part.') + '</div>' +
+        '<div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap">' +
+          '<button class="btn btn-ghost" onclick="loadLecture()">&#8592; Back to Lecture</button>' +
+          '<button class="btn btn-ghost" onclick="startQuiz()">Retry Quiz</button>' +
+          nextBtn +
+        '</div>' +
+      '</div>';
+    return;
+  }
+  var q = qs[quizIdx];
+  var pct2 = Math.round((quizIdx / qs.length) * 100);
+  qv.innerHTML =
+    '<div class="qHeader">' +
+      '<span class="qChip chipC">&#10003; ' + quizCorrect + '</span>' +
+      '<span class="qChip chipW">&#10007; ' + quizWrong + '</span>' +
+      '<span class="qChip chipN">Q ' + (quizIdx + 1) + ' of ' + qs.length + '</span>' +
+    '</div>' +
+    '<div class="progWrap"><div class="progFill" style="width:' + pct2 + '%"></div></div>' +
+    '<div class="qBox">' +
+      '<div class="qLabel">Multiple Choice</div>' +
+      '<div class="qText">' + q.q + '</div>' +
+    '</div>' +
+    '<div class="opts" id="opts"></div>' +
+    '<div class="fb" id="fb"></div>' +
+    '<button class="btn btn-gold" id="nextQBtn" style="display:none" onclick="nextQ()">Next Question &#8594;</button>';
+  q.opts.forEach(function(o, i) {
+    var b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = String.fromCharCode(65 + i) + ') ' + o;
+    b.onclick = (function(idx) { return function() { selectAns(idx); }; })(i);
+    document.getElementById('opts').appendChild(b);
+  });
+}
+
+function selectAns(i) {
+  var q = SD.modules[curMod].parts[curPart].quiz[quizIdx];
+  document.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
+  var fb = document.getElementById('fb');
+  if (i === q.ans) {
+    document.querySelectorAll('.opt')[i].classList.add('correct');
+    quizCorrect++;
+    fb.className = 'fb good show';
+    fb.textContent = 'Correct! ' + q.exp;
+  } else {
+    document.querySelectorAll('.opt')[i].classList.add('wrong');
+    document.querySelectorAll('.opt')[q.ans].classList.add('correct');
+    quizWrong++;
+    fb.className = 'fb bad show';
+    fb.textContent = 'Not quite. ' + q.exp;
+  }
+  document.getElementById('nextQBtn').style.display = 'block';
+}
+
+function nextQ() { quizIdx++; renderQuizQ(); }
+
+function nextPartExists() {
+  var m = SD.modules[curMod];
+  return curPart < m.parts.length - 1 || curMod < SD.modules.length - 1;
+}
+
+function goNextPart() {
+  var m = SD.modules[curMod];
+  if (curPart < m.parts.length - 1) { curPart++; curSeg = 0; }
+  else if (curMod < SD.modules.length - 1) {
+    curMod++; curPart = 0; curSeg = 0;
+    document.querySelectorAll('.mBtn').forEach(function(b, i) { b.classList.toggle('active', i === curMod); });
+  }
+  inQuiz = false; buildPartBar(); loadLecture();
+}
+
+// ================================================================
+//  INIT
+// ================================================================
+if (openaiKey) {
+  hideKeyModal();
+  setStatus('ready', 'API key loaded. Press Play on any section.');
+}
+selectModule(0);
+</script>
+</body>
+</html>
